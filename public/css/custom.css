@@ -1,0 +1,506 @@
+/* ===== Notificaciones de chat (toast) ===== */
+.chat-notification {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1100;
+    width: 90%;
+    max-width: 500px;
+}
+
+.chat-notification .alert {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, .1);
+    border: none;
+    border-radius: 8px;
+    padding: 12px 20px;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.chat-notification .alert-success {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.chat-notification .alert-warning {
+    background-color: #fff3cd;
+    color: #856404;
+}
+
+.chat-notification .alert-danger {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+.chat-notification .alert-info {
+    background-color: #d1ecf1;
+    color: #0c5460;
+}
+
+.chat-notification .btn-close {
+    padding: .5rem;
+    margin-left: 1rem;
+    opacity: .7;
+}
+
+/* ===== Header ===== */
+.header-icon-separator {
+    margin-right: 25px !important;
+}
+
+.header-profile-dropdown {
+    margin-left: 10px !important;
+}
+
+.me-6 {
+    margin-right: 1.5rem !important;
+}
+
+.notification-icon {
+    position: relative;
+    margin-right: 24px;
+    color: #ffffff !important;
+}
+
+.notification-badge {
+    position: absolute;
+    top: 0;
+    right: -12px;
+    font-size: .65rem;
+    min-width: 1.2rem;
+    height: 1.2rem;
+    background-color: #ffca28 !important;
+    color: #ffffff !important;
+}
+
+/* ===== Dropdown de notificaciones ===== */
+.notification-dropdown {
+    min-width: 320px;
+    padding: 0;
+    background-color: #ffffff !important;
+}
+
+.notification-header {
+    background-color: #edf2f7 !important;
+    padding: .75rem 1rem;
+    font-weight: 600;
+    color: #000 !important;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.notification-item {
+    padding: .75rem 1rem;
+    border-bottom: 1px solid #f1f1f1;
+    position: relative;
+}
+
+.notification-item:hover {
+    background-color: #f8f9fa;
+}
+
+.notification-item.unread:before {
+    content: "";
+    display: block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: var(--bs-primary);
+    /* FIX */
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.notification-content {
+    display: flex;
+    align-items: flex-start;
+}
+
+.notification-icon {
+    margin-right: 12px;
+    font-size: 1.2rem;
+}
+
+.notification-text {
+    flex: 1;
+}
+
+.notification-message {
+    margin-bottom: 3px;
+    font-weight: 500;
+}
+
+.notification-meta {
+    font-size: .75rem;
+    color: #6c757d;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.notification-time {
+    flex-shrink: 0;
+}
+
+.notification-footer {
+    padding: .75rem 1rem;
+    text-align: center;
+    border-top: 1px solid #e9ecef;
+}
+
+.notification-footer a {
+    color: var(--bs-primary);
+    font-weight: 500;
+    text-decoration: none;
+}
+
+/* FIX */
+.notification-footer a:hover {
+    text-decoration: underline;
+}
+
+/* Iconos por tipo */
+.notification-icon.expiring {
+    color: #ffc107;
+}
+
+.notification-icon.expired {
+    color: var(--bs-danger);
+}
+
+/* FIX */
+.notification-route {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 200px;
+}
+
+/* ===== Utilidades de texto ===== */
+.text-primary-light {
+    color: #ffffff !important;
+}
+
+.text-secondary-light {
+    color: #a0aec0 !important;
+}
+
+.text-primary-dark {
+    color: #000000 !important;
+}
+
+.text-secondary-dark {
+    color: #718096 !important;
+}
+
+/* ===== Botones custom (por si los usas) ===== */
+.btn-primary-custom {
+    background-color: var(--bs-primary) !important;
+    color: #ffffff !important;
+}
+
+.btn-primary-custom:hover {
+    background-color: rgba(var(--bs-primary-rgb), .9) !important;
+}
+
+.btn-secondary-custom {
+    background-color: var(--bs-success) !important;
+    color: #ffffff !important;
+}
+
+/* FIX */
+.btn-secondary-custom:hover {
+    background-color: rgba(var(--bs-success-rgb), .9) !important;
+}
+
+/* ===== Tabs ===== */
+.nav-tabs .nav-link {
+    color: #1a2b4c !important;
+    border: none;
+    border-bottom: 3px solid transparent;
+    padding: .75rem 1.25rem;
+    font-weight: 500;
+    transition: all .3s ease;
+}
+
+.nav-tabs .nav-link:hover {
+    color: var(--bs-success) !important;
+}
+
+/* FIX */
+.nav-tabs .nav-link.active {
+    color: var(--bs-success) !important;
+    border-bottom-color: var(--bs-success);
+    /* FIX */
+    background-color: transparent;
+}
+
+.nav-tab-carga {
+    color: #00bcd4 !important;
+}
+
+.nav-tab-enviadas {
+    color: #ffca28 !important;
+}
+
+.nav-tab-estadisticas {
+    color: #a0aec0 !important;
+}
+
+/* ===== Secciones ===== */
+.section-header-carga {
+    background-color: #edf2f7 !important;
+    color: #000 !important;
+}
+
+.section-header-ruta {
+    background-color: #e6fff3 !important;
+    color: #000 !important;
+}
+
+/* ===== Enlaces ===== */
+.link-carga {
+    color: var(--bs-primary) !important;
+}
+
+/* mejor usar tu primary */
+.link-ruta {
+    color: var(--bs-success) !important;
+}
+
+/* FIX */
+
+/* ===== Estados ===== */
+.status-accepted {
+    background-color: var(--bs-success) !important;
+    color: #fff !important;
+}
+
+/* FIX */
+.status-pending {
+    background-color: #ffca28 !important;
+    color: #000 !important;
+}
+
+/* ===== Tarjetas ===== */
+.card {
+    background-color: #ffffff !important;
+}
+
+.card .card-title {
+    color: #000 !important;
+}
+
+.card .card-text {
+    color: #718096 !important;
+}
+
+/* Logo */
+.site-logo {
+    height: 20px;
+    width: auto;
+    transition: transform .3s ease;
+}
+
+.site-logo:hover {
+    transform: scale(1.05);
+}
+
+@media (max-width: 768px) {
+    .site-logo {
+        height: 16px;
+    }
+}
+
+/* ===== Container padding extra ===== */
+.container {
+    padding-left: calc(1.5rem * 1.2) !important;
+    padding-right: calc(1.5rem * 1.2) !important;
+}
+
+@media (min-width: 992px) {
+    .container {
+        padding-left: calc(2rem * 1.2) !important;
+        padding-right: calc(2rem * 1.2) !important;
+    }
+}
+
+@media (min-width: 1200px) {
+    .container {
+        padding-left: calc(2.25rem * 1.2) !important;
+        padding-right: calc(2.25rem * 1.2) !important;
+    }
+}
+
+/* ===== Menú de notificaciones: anchos forzados cross-browser ===== */
+.dropdown-content,
+.dropdown-menu,
+div[role="menu"] {
+    min-width: 400px !important;
+    width: 400px !important;
+    max-width: 90vw !important;
+}
+
+#notification-list {
+    min-width: 100% !important;
+    width: 100% !important;
+}
+
+.notification-item,
+.dropdown-item,
+#notification-list a {
+    white-space: normal !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
+    word-break: break-word !important;
+    word-wrap: break-word !important;
+    display: block !important;
+    width: 100% !important;
+}
+
+[x-ref="panel"] {
+    min-width: 400px !important;
+    width: 400px !important;
+    max-width: 90vw !important;
+}
+
+/* ===== Modals ===== */
+.modal-body,
+.modal-body h4,
+.modal-body p,
+.modal-body strong {
+    color: #333333 !important;
+}
+
+/* Contenido en contenedores claros: asegurar contraste */
+.container .card,
+.container .card-body,
+.container .form-control,
+.container label,
+.container p,
+.container h1,
+.container h2,
+.container h3,
+.container h4,
+.container h5,
+.container h6 {
+    color: #000 !important;
+}
+
+/* PERO si están en fondo oscuro, forzar blanco */
+.bg-nav h1,
+.bg-nav h2,
+.bg-nav h3,
+.bg-nav h4,
+.bg-nav h5,
+.bg-nav h6 {
+    color: #fff !important;
+}
+
+.container .form-control,
+.container .form-select,
+.container input[type="text"],
+.container input[type="email"],
+.container input[type="password"],
+.container input[type="number"],
+.container input[type="date"],
+.container textarea,
+.container select {
+    background-color: #fff !important;
+    color: #000 !important;
+    border: 1px solid #ced4da !important;
+}
+
+.container .form-control::placeholder,
+.container input::placeholder,
+.container textarea::placeholder {
+    color: #6c757d !important;
+    opacity: .8;
+}
+
+.card-body p,
+.card-body span,
+.card-body div {
+    color: #000 !important;
+}
+
+/* Evitar que forcemos colores en componentes que ya tienen su semántica */
+.badge,
+.btn,
+.alert,
+.text-success,
+.text-danger,
+.text-warning,
+.text-info,
+.text-primary,
+.nav-link,
+.text-white,
+.navbar-brand {
+    color: inherit !important;
+}
+
+/* Headers de cards: blanco si fondo oscuro; negro si fondo claro (por inline styles/clases) */
+.card-header {
+    color: #fff !important;
+}
+
+.card-header h5,
+.card-header .h5,
+.card-header h5.mb-0,
+.card-header .mb-0.h5 {
+    color: #fff !important;
+}
+
+#mis-ofertas .card-header h5,
+#mis-ofertas .card-header .h5 {
+    color: #fff !important;
+}
+
+.card-header:not([style*="background-color"]) h5,
+.card-header:not([style*="background-color"]) .h5,
+.card-header.bg-white h5,
+.card-header.bg-white .h5,
+.card-header.bg-light h5,
+.card-header.bg-light .h5 {
+    color: #000 !important;
+}
+
+/* Tabs del dashboard */
+#dashboardTab .nav-link {
+    color: #000 !important;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    border-bottom: 3px solid transparent;
+    font-weight: 500;
+    transition: all .2s ease;
+}
+
+#dashboardTab .nav-link.active {
+    border-color: var(--color-primary, #3182ce);
+    color: #fff !important;
+    background-color: var(--color-nav-background, #2d3748) !important;
+}
+
+#dashboardTab .nav-link:hover {
+    color: var(--color-primary, #3182ce) !important;
+}
+
+#mis-ofertas-tab,
+#bids-enviados-tab,
+#bids-recibidos-tab,
+#estadisticas-tab {
+    color: #000 !important;
+}
+
+#mis-ofertas-tab.active,
+#bids-enviados-tab.active,
+#bids-recibidos-tab.active,
+#estadisticas-tab.active {
+    color: #fff !important;
+    background-color: var(--color-nav-background, #2d3748) !important;
+}
