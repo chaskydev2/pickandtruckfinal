@@ -6,7 +6,7 @@
         <div class="col-lg-8">
             <div class="card shadow-sm">
                 <div class="card-body p-4 p-md-5">
-                    <h1 class="display-5 fw-bold mb-4 text-primary">Publicar</h1>
+                    <h1 class="display-5 fw-bold mb-4 text-primary">Publicar Ruta</h1>
 
                     <form action="{{ route('ofertas.store') }}" method="POST">
                         @csrf

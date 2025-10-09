@@ -72,17 +72,6 @@
                             <div class="form-text">Dejar vacío si no aplica.</div>
                         </div>
 
-                        <!-- ④ NUEVO: Es contenedor -->
-                        <div class="mb-3 form-check">
-                            <input class="form-check-input @error('es_contenedor') is-invalid @enderror" type="checkbox" value="1"
-                                id="es_contenedor" name="es_contenedor" 
-                                {{ old('es_contenedor', $oferta->es_contenedor) ? 'checked' : '' }}>
-                            <label class="form-check-label" for="es_contenedor">¿Es contenedor?</label>
-                            @error('es_contenedor')
-                                <div class="invalid-feedback d-block">{{ $message }}</div>
-                            @enderror
-                        </div>
-
                         <div class="mb-3">
                             <label for="descripcion" class="form-label">Comentarios (Opcional)</label>
                             <textarea class="form-control @error('descripcion') is-invalid @enderror" id="descripcion" name="descripcion" rows="3" placeholder="Ej: La carga requiere refrigeración, frágil, etc.">{{ old('descripcion', $oferta->descripcion) }}</textarea>

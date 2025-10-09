@@ -53,10 +53,6 @@
                                         <p class="mb-0">{{ $oferta->fecha_inicio->format('d/m/Y h:i A') }}</p>
                                     </div>
                                     <div class="col-md-6 mb-3">
-                                        <h6 class="fw-bold text-muted mb-2">Fecha Límite</h6>
-                                        <p class="mb-0">{{ $oferta->fecha_limite ?? 'No especificada' }}</p>
-                                    </div>
-                                    <div class="col-md-6 mb-3">
                                         <h6 class="fw-bold text-muted mb-2">Tipo de Carga</h6>
                                         <p class="mb-0">{{ $oferta->cargoType?->name ?? 'No especificado' }}</p>
                                     </div>
@@ -81,18 +77,6 @@
                                             <p class="mb-0">{{ number_format($oferta->unidades) }}</p>
                                         </div>
                                     @endif
-
-                                    <!-- ⑧ NUEVO: Es contenedor -->
-                                    <div class="col-md-6 mb-3">
-                                        <h6 class="fw-bold text-muted mb-2">Contenedor</h6>
-                                        <p class="mb-0">
-                                            @if ($oferta->es_contenedor)
-                                                <span class="badge bg-info text-dark">Sí</span>
-                                            @else
-                                                <span class="badge bg-secondary">No</span>
-                                            @endif
-                                        </p>
-                                    </div>
 
                                     <div class="col-md-6 mb-3">
                                         <h6 class="fw-bold text-muted mb-2">Presupuesto</h6>

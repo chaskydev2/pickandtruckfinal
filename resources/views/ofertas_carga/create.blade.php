@@ -6,7 +6,7 @@
         <div class="col-lg-8">
             <div class="card shadow-sm">
                 <div class="card-body p-4 p-md-5">
-                    <h1 class="display-5 fw-bold mb-4 text-primary">Publicar</h1>
+                    <h1 class="display-5 fw-bold mb-4 text-primary">Publicar Carga</h1>
                     <form action="{{ route('ofertas_carga.store') }}" method="POST">
                         @csrf
                         
@@ -70,21 +70,8 @@
                             <div class="form-text">Dejar vacío si no aplica.</div>
                         </div>
 
-                        <!-- ② NUEVO: Es contenedor -->
-                        <div class="mb-4 form-check">
-                            <input class="form-check-input @error('es_contenedor') is-invalid @enderror" type="checkbox" value="1"
-                                id="es_contenedor" name="es_contenedor" {{ old('es_contenedor') ? 'checked' : '' }}>
-                            <label class="form-check-label" for="es_contenedor">
-                                ¿Es contenedor?
-                            </label>
-                            @error('es_contenedor')
-                                <div class="invalid-feedback d-block">{{ $message }}</div>
-                            @enderror
-                            <div class="form-text">Si la carga es un contenedor marítimo estándar, marca esta casilla.</div>
-                        </div>
-
                         <div class="mb-4">
-                            <label for="descripcion" class="form-label">Comentarios (Opcional)</label>
+                            <label for="descripcion" class="form-label">Comentarios (Opcional) <i class="fas fa-question-circle text-muted" data-bs-toggle="tooltip" data-bs-placement="right" title="Añada detalles adicionales como: requiere refrigeración, es frágil, horarios especiales, etc."></i></label>
                             <textarea class="form-control @error('descripcion') is-invalid @enderror" id="descripcion" name="descripcion" rows="3" placeholder="Ej: La carga requiere refrigeración, frágil, etc.">{{ old('descripcion') }}</textarea>
                             @error('descripcion')
                                 <div class="invalid-feedback">{{ $message }}</div>
@@ -93,7 +80,7 @@
                         </div>
 
                         <div class="mb-4">
-                            <label for="presupuesto" class="form-label">Presupuesto (USD)</label>
+                            <label for="presupuesto" class="form-label">Presupuesto (USD) <i class="fas fa-question-circle text-muted" data-bs-toggle="tooltip" data-bs-placement="right" title="Monto máximo en dólares que está dispuesto a pagar por el servicio de transporte"></i></label>
                             <div class="input-group">
                                 <input type="number" step="0.01" min="0" class="form-control @error('presupuesto') is-invalid @enderror" 
                                        id="presupuesto" name="presupuesto" value="{{ old('presupuesto') }}" required style="appearance: textfield; -moz-appearance: textfield; -webkit-appearance: textfield;">
@@ -138,6 +125,12 @@ function initAutocomplete() {
 
 // El resto de tu lógica va fuera de initAutocomplete
 document.addEventListener('DOMContentLoaded', function () {
+    // Inicializar tooltips de Bootstrap
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+    
     // Establecer fecha mínima
     const elFecha = document.getElementById('fecha_inicio');
     if (elFecha) {
