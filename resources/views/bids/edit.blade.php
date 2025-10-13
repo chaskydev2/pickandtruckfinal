@@ -71,13 +71,28 @@
                         </div>
 
                         <div class="mb-3">
+                            <label for="unidades" class="form-label">Unidades</label>
+                            <input type="number" 
+                                class="form-control" 
+                                id="unidades" 
+                                min="1" 
+                                step="1" 
+                                value="1">
+                            <small class="text-muted">Cantidad de unidades para esta oferta</small>
+                        </div>
+
+                        <div class="mb-3">
                             <label for="comentario" class="form-label">Comentario (opcional)</label>
                             <textarea class="form-control @error('comentario') is-invalid @enderror" 
                                       name="comentario" 
-                                      rows="4">{{ old('comentario', $bid->comentario) }}</textarea>
+                                      id="comentario"
+                                      rows="4" 
+                                      maxlength="300">{{ old('comentario', $bid->comentario) }}</textarea>
                             @error('comentario')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
+                            <small class="text-muted">Máximo 300 caracteres permitidos.</small>
+                            <div class="text-end text-muted" id="charCount">300 caracteres restantes</div>
                         </div>
 
                         <div class="d-flex justify-content-between">
@@ -95,3 +110,26 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const comentarioInput = document.getElementById('comentario');
+    const charCount = document.getElementById('charCount');
+    const submitBtn = document.querySelector('button[type="submit"]');
+
+    comentarioInput.addEventListener('input', function() {
+        const remaining = 300 - comentarioInput.value.length;
+        charCount.textContent = `${remaining} caracteres restantes`;
+
+        if (remaining < 0) {
+            submitBtn.disabled = true;
+            charCount.classList.add('text-danger');
+        } else {
+            submitBtn.disabled = false;
+            charCount.classList.remove('text-danger');
+        }
+    });
+});
+</script>
+@endpush

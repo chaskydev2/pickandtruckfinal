@@ -62,7 +62,7 @@
                                 Unidades <i class="fas fa-question-circle text-muted" data-bs-toggle="tooltip" data-bs-placement="right" title="Cantidad de bultos/unidades de la carga"></i>
                             </label>
                             <input type="number" min="1" class="form-control @error('unidades') is-invalid @enderror"
-                                id="unidades" name="unidades" value="{{ old('unidades') }}" 
+                                id="unidades" name="unidades" value="1" readonly disabled
                                 style="appearance: textfield; -moz-appearance: textfield; -webkit-appearance: textfield;">
                             @error('unidades')
                                 <div class="invalid-feedback">{{ $message }}</div>
@@ -96,7 +96,7 @@
                             <a href="{{ route('ofertas_carga.index') }}" class="btn-pickn">
                                 <i class="fas fa-arrow-left me-1"></i> Volver
                             </a>
-                            <button type="submit" class="btn-pickn">
+                            <button type="submit" class="btn btn-success">
                                 <i class="fas fa-save me-1"></i> Guardar
                             </button>
                         </div>

@@ -68,7 +68,7 @@
                     <div>
                         <span class="badge bg-success">{{ $oferta->truckType?->name ?? 'Ruta' }}</span>
                         @if ($oferta->tipo_despacho)
-                            <span class="badge bg-info text-dark ms-2">{{ $oferta->tipo_despacho_texto }}</span>
+                            <span class="badge-darkish ms-2" style="color:#ffffff !important; font-weight:500 !important;">{{ $oferta->tipo_despacho_texto }}</span>
                         @endif
                         @if (!is_null($oferta->unidades))
                             <span class="badge bg-secondary ms-2">{{ number_format($oferta->unidades) }} uds</span>
@@ -167,9 +167,18 @@
                 <div class="mb-3">
                     <div class="d-flex justify-content-between mb-2">
                         <span>Ofertas recibidas:</span>
-                        <span class="badge bg-{{ $oferta->bids->count() > 0 ? 'success' : 'secondary' }}">
-                            {{ $oferta->bids->count() }}
-                        </span>
+                        @if($oferta->bids->count() > 0)
+                            <span class="badge offer-count">
+                                {{ $oferta->bids->count() }}
+                            </span>
+                        @else
+                            @php $bidsCount = $oferta->bids->count(); @endphp
+                            @if($bidsCount > 0)
+                                <span class="badge offer-count">{{ $bidsCount }}</span>
+                            @else
+                                <span class="badge bg-secondary">0</span>
+                            @endif
+                        @endif
                     </div>
                 </div>
 
@@ -191,7 +200,7 @@
                             {{-- No involucrado --}}
                             @if ($locked)
                                 {{-- Bloqueado por otro → No disponible (sin Hacer oferta) --}}
-                                <button class="btn btn-secondary" disabled>
+                                <button class="btn btn-unavailable" disabled>
                                     <i class="fas fa-ban"></i> No disponible
                                 </button>
                             @else
@@ -202,7 +211,7 @@
                                         <i class="fas fa-hand-holding-usd"></i> Hacer Oferta
                                     </a>
                                 @else
-                                    <button class="btn btn-secondary" disabled>
+                                    <button class="btn btn-unavailable" disabled>
                                         <i class="fas fa-lock"></i> No disponible
                                     </button>
                                 @endcan

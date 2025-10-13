@@ -12,8 +12,12 @@
             <li class="nav-item">
                 <a class="nav-link {{ request()->get('view') === 'mine' ? 'active' : '' }}"
                     href="{{ route('ofertas.index', ['view' => 'mine']) }}">
-                    <i class="fas fa-user-check me-1"></i> Mis Publicaciones <span
-                        class="badge bg-secondary">{{ $misOfertasCount }}</span>
+                    <i class="fas fa-user-check me-1"></i> Mis Publicaciones
+                    @if($misOfertasCount > 0)
+                        <span class="badge offer-count">{{ $misOfertasCount }}</span>
+                    @else
+                        <span class="badge bg-secondary">{{ $misOfertasCount }}</span>
+                    @endif
                 </a>
             </li>
         </ul>
@@ -72,7 +76,7 @@
 
                     <div class="col-md-3">
                         <div class="d-grid gap-2">
-                            <button type="submit" class="btn btn-secondary">
+                            <button type="submit" class="btn btn-success">
                                 <i class="fas fa-search"></i> Buscar
                             </button>
                         </div>

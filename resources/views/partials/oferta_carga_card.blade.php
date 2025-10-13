@@ -60,14 +60,14 @@
             <!-- Columna izquierda: Info principal -->
             <div class="col-md-8 border-end">
                 <div class="d-flex justify-content-between mb-3">
-                    <span class="badge bg-primary">{{ $oferta->cargoType->name ?? 'Carga' }}</span>
+                    <span class="badge-darkish" style="color:#ffffff !important; font-weight:500 !important;">{{ $oferta->cargoType->name ?? 'Carga' }}</span>
                     <div class="d-flex align-items-center gap-2">
                         @if ($statusBadge)
                             <span class="badge bg-{{ $statusBadge['class'] }}">{{ $statusBadge['text'] }}</span>
                         @endif
                         <span class="text-muted">{{ $oferta->created_at->diffForHumans() }}</span>
                         @if ($oferta->es_contenedor)
-                            <span class="badge bg-info text-dark ms-1">Contenedor</span>
+                            <span class="badge-darkish ms-1" style="color:#ffffff !important; font-weight:500 !important;">Contenedor</span>
                         @endif
                     </div>
                 </div>
@@ -158,9 +158,12 @@
                 <div class="mb-3">
                     <div class="d-flex justify-content-between mb-2">
                         <span>Ofertas recibidas:</span>
-                        <span class="badge bg-{{ $oferta->bids->count() > 0 ? 'success' : 'secondary' }}">
-                            {{ $oferta->bids->count() }}
-                        </span>
+                        @php $bidsCount = $oferta->bids->count(); @endphp
+                        @if($bidsCount > 0)
+                            <span class="badge offer-count">{{ $bidsCount }}</span>
+                        @else
+                            <span class="badge bg-secondary">0</span>
+                        @endif
                     </div>
                 </div>
 
@@ -182,7 +185,7 @@
                             {{-- No involucrado --}}
                             @if ($locked)
                                 {{-- Bloqueado por otro → No disponible (sin Hacer oferta) --}}
-                                <button class="btn btn-secondary" disabled>
+                                <button class="btn btn-unavailable" disabled>
                                     <i class="fas fa-ban"></i> No disponible
                                 </button>
                             @else
@@ -193,7 +196,7 @@
                                         <i class="fas fa-hand-holding-usd"></i> Hacer Oferta
                                     </a>
                                 @else
-                                    <button class="btn btn-secondary" disabled>
+                                    <button class="btn btn-unavailable" disabled>
                                         <i class="fas fa-lock"></i> No disponible
                                     </button>
                                 @endcan

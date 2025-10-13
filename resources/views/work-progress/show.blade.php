@@ -126,7 +126,7 @@
                 {{-- CARD: Estado y acciones del servicio --}}
                 <div class="card mb-4">
                     <div class="card-header d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0">Detalles del Servicio</h5>
+                        <h3 class="mb-0 fw-bold">Detalles del Servicio</h3>
                         <span id="bidStatusBadge" class="status-badge {{ $statusClass }}">
                             {{ $statusText }}
                         </span>

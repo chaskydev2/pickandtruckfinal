@@ -101,13 +101,21 @@
                             </small>
                         </div>
 
+                        <div class="mb-3">
+                            <label for="unidades" class="form-label">Unidades</label>
+                            <input type="number" class="form-control" id="unidades" min="1" step="1" value="1">
+                            <small class="text-muted">Cantidad de unidades para esta oferta</small>
+                        </div>
+
                         <div class="mb-4">
                             <label for="mensaje" class="form-label">Comentario (opcional)</label>
-                            <textarea class="form-control @error('mensaje') is-invalid @enderror" id="mensaje" name="mensaje" rows="3">{{ old('mensaje') }}</textarea>
+                            <textarea class="form-control @error('mensaje') is-invalid @enderror" id="mensaje" name="mensaje" rows="3" maxlength="300">{{ old('mensaje') }}</textarea>
                             @error('mensaje')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
-                            <small class="text-muted">Puede incluir detalles adicionales sobre su oferta.</small>
+                            <small class="text-muted">Puede incluir detalles adicionales sobre su oferta. Máximo 300 caracteres.</small>
+                            <div class="text-end text-muted" id="charCount">300 caracteres restantes</div>
+                            <div class="text-danger d-none" id="errorMsg">No se permite ingresar más de 300 caracteres.</div>
                         </div>
 
                         <div class="d-grid gap-2 d-md-flex justify-content-md-end">
@@ -128,13 +136,30 @@
 @push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    const mensajeInput = document.getElementById('mensaje');
+    const charCount = document.getElementById('charCount');
+    const errorMsg = document.getElementById('errorMsg');
+    const submitBtn = document.getElementById('submitBtn');
+
+    mensajeInput.addEventListener('input', function() {
+        const remaining = 300 - mensajeInput.value.length;
+        charCount.textContent = `${remaining} caracteres restantes`;
+
+        if (remaining < 0) {
+            submitBtn.disabled = true;
+            charCount.classList.add('text-danger');
+            errorMsg.classList.remove('d-none');
+        } else {
+            submitBtn.disabled = false;
+            charCount.classList.remove('text-danger');
+            errorMsg.classList.add('d-none');
+        }
+    });
+
     // Prevenir doble envío del formulario
     const form = document.getElementById('bidForm');
-    const submitBtn = document.getElementById('submitBtn');
-    
     if (form) {
         form.addEventListener('submit', function() {
-            // Deshabilitar el botón al enviar para evitar múltiples clics
             if (submitBtn) {
                 submitBtn.disabled = true;
                 submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Enviando...';

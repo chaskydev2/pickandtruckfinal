@@ -160,6 +160,84 @@
         .text-white {
             color: inherit !important;
         }
+
+        /* Color personalizado para el contador de ofertas (tono oscuro de la imagen) */
+        .offer-count {
+            display: inline-block !important;
+            min-width: 34px;
+            height: 26px;
+            line-height: 26px;
+            padding: 0 8px !important;
+            text-align: center !important;
+            background-color: #0f1724 !important; /* tono oscuro */
+                color: #ffffff !important; /* número en blanco */
+                border-radius: 6px !important;
+                font-weight: 500 !important;
+            box-shadow: none !important;
+        }
+        /* Forzar color blanco en cualquier elemento hijo dentro de la chapita */
+        .offer-count,
+        .offer-count * {
+            color: #ffffff !important;
+        }
+        /* Selector aún más específico para evitar estilos de .text-muted u otros */
+        .badge.offer-count,
+        .badge.offer-count * {
+            color: #ffffff !important;
+            background-color: #0f1724 !important;
+        }
+        /* Nueva clase para badges oscuros (evita overflow y mantiene texto blanco) */
+        .badge-darkish {
+            display: inline-block !important;
+            white-space: nowrap !important;
+            overflow: hidden !important;
+            text-overflow: ellipsis !important;
+            max-width: 160px !important;
+            padding: 0.25rem 0.5rem !important;
+            background-color: #0f1724 !important;
+            color: #ffffff !important;
+            border-radius: 8px !important;
+                font-weight: 500 !important;
+            line-height: 1 !important;
+        }
+        /* Reglas con especificidad alta para sobrescribir '.container .card { color: #000 !important }' */
+        .container .card .badge-darkish,
+        .container .card .badge-darkish *,
+        .container .card .offer-count,
+        .container .card .offer-count * {
+            color: #ffffff !important;
+            font-weight: 500 !important;
+        }
+            /* Forzar hijos de badge-darkish a color blanco y peso 500 */
+            .badge-darkish,
+            .badge-darkish * {
+                color: #ffffff !important;
+                font-weight: 500 !important;
+            }
+            /* Asegurar renderizado blanco incluso con reglas extrañas heredadas */
+            .badge-darkish,
+            .badge-darkish *,
+            .offer-count,
+            .offer-count * {
+                -webkit-text-fill-color: #ffffff !important;
+                color: #ffffff !important;
+                text-shadow: none !important;
+                mix-blend-mode: normal !important;
+            }
+            /* Botón 'No disponible' - tono claro y apariencia deshabilitada */
+            .btn-unavailable {
+                background-color: #e9f7f1 !important; /* very light green tint */
+                color: #6c757d !important; /* muted gray text to indicate disabled */
+                border-color: rgba(0,0,0,0.05) !important;
+                box-shadow: none !important;
+            }
+            .btn-unavailable[disabled],
+            .btn-unavailable:disabled {
+                opacity: 0.85 !important;
+                filter: none !important;
+                cursor: not-allowed !important;
+                color: #6c757d !important;
+            }
     </style>
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
