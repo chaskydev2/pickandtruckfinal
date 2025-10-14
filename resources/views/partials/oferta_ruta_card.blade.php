@@ -56,7 +56,7 @@
 <div class="card feed-card mb-4 hover-shadow {{ $locked ? 'border-success' : '' }}">
     @if ($ribbonText)
         <div class="ribbon ribbon-top-right">
-            <span>{{ $ribbonText }}</span>
+            <span class="ribbon-trabajo-terminado" @if($ribbonText==="Trabajo terminado") style="color:#fff !important;" @endif>{{ $ribbonText }}</span>
         </div>
     @endif
 
@@ -120,7 +120,8 @@
 
                 @if ($myAnyBid)
                     @if ($myAnyBid->estado === 'terminado')
-                        <div class="alert alert-warning p-2 mb-3">
+                        {{-- Suave: alerta verde de baja saturación para Trabajo terminado --}}
+                        <div class="alert alert-success-soft p-2 mb-3">
                             <i class="fas fa-info-circle me-1"></i> Ya ofertaste en esta ruta (Trabajo terminado)
                         </div>
                     @elseif ($myAnyBid->estado === 'pendiente_confirmacion')
@@ -128,7 +129,7 @@
                             <i class="fas fa-hourglass-half me-1"></i> Tienes una finalización pendiente de confirmar.
                         </div>
                     @else
-                        <div class="alert alert-info p-2 mb-3">
+                        <div class="alert alert-success-soft p-2 mb-3">
                             <i class="fas fa-info-circle me-1"></i> Ya ofertaste en esta ruta
                         </div>
                     @endif
@@ -171,12 +172,12 @@
                             <span class="badge offer-count">
                                 {{ $oferta->bids->count() }}
                             </span>
-                        @else
+                            @else
                             @php $bidsCount = $oferta->bids->count(); @endphp
                             @if($bidsCount > 0)
                                 <span class="badge offer-count">{{ $bidsCount }}</span>
                             @else
-                                <span class="badge bg-secondary">0</span>
+                                <span class="badge offer-count">0</span>
                             @endif
                         @endif
                     </div>
@@ -192,7 +193,7 @@
                         @if ($involved && $bidForTracking)
                             {{-- Involucrado en bid bloqueante (aceptado/pendiente_confirmacion/terminado) --}}
                             <a href="{{ route('work.show', $bidForTracking) }}"
-                                class="btn {{ $myBlockingBid && $myBlockingBid->estado === 'terminado' ? 'btn-secondary' : 'btn-success' }}">
+                                class="btn {{ $myBlockingBid && $myBlockingBid->estado === 'terminado' ? 'btn-historico' : 'btn-success' }}">
                                 <i class="fas fa-truck-loading"></i>
                                 {{ $myBlockingBid && $myBlockingBid->estado === 'terminado' ? 'Ver seguimiento (histórico)' : 'Seguimiento' }}
                             </a>

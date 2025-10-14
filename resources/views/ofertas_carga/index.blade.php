@@ -160,7 +160,7 @@
                 width: 20px;
                 height: 20px;
                 background-color: #fff;
-                border: 3px solid #0d6efd;
+                border: 3px solid #0f1724;
                 border-radius: 50%;
             }
 
@@ -205,14 +205,14 @@
                 z-index: 1;
             }
 
-            .ribbon::before,
-            .ribbon::after {
-                position: absolute;
-                z-index: -1;
-                content: '';
-                display: block;
-                border: 5px solid #0d6efd;
-            }
+                .ribbon::before,
+                .ribbon::after {
+                    position: absolute;
+                    z-index: -1;
+                    content: '';
+                    display: block;
+                    border: 5px solid #0f1724;
+                }
 
             .ribbon span {
                 position: absolute;
@@ -277,11 +277,25 @@
                         try {
                             const url = "{{ route('partials.ofertas_carga.card', ':id') }}".replace(':id', e
                                 .publication.id);
+                .ribbon span {
+                    position: absolute;
+                    display: block;
+                    width: 225px;
+                    padding: 8px 0;
+                    background-color: #0f1724;
+                    box-shadow: 0 5px 10px rgba(0, 0, 0, .1);
+                    color: #fff;
+                    font-size: 14px;
+                    font-weight: 600;
+                    text-shadow: 0 1px 1px rgba(0, 0, 0, .2);
+                    text-transform: uppercase;
+                    text-align: center;
+                }
                             const html = await fetch(url, {
                                 headers: {
-                                    'X-Requested-With': 'XMLHttpRequest'
-                                }
-                            }).then(r => r.text());
+                .border-primary {
+                    border: 2px solid #0f1724 !important;
+                }
                             const wrapper = document.createElement('div');
                             wrapper.innerHTML = html.trim();
                             const el = wrapper.firstElementChild;

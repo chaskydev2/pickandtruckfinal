@@ -238,6 +238,43 @@
                 cursor: not-allowed !important;
                 color: #6c757d !important;
             }
+            /* Forzar texto blanco en botones verdes (primarios de publicación/búsqueda) */
+            .btn-success,
+            .btn-pickn,
+            .btn-success *,
+            .btn-pickn * {
+                color: #ffffff !important;
+                -webkit-text-fill-color: #ffffff !important;
+            }
+            /* Asegurar iconos y espaciados se mantengan blancos */
+            .btn-success .fas,
+            .btn-pickn .fas {
+                color: #ffffff !important;
+            }
+            /* ===== Notificación: hacer el contador blanco con número oscuro para visibilidad en header oscuro ===== */
+            /* .notif-badge es la clase usada en el trigger; #notification-badge es el id real */
+            #notification-badge,
+            .notif-badge {
+                background-color: #ffffff !important; /* fondo blanco */
+                color: #0f1724 !important; /* número en tono oscuro */
+                border-radius: 999px !important;
+                padding: 0 6px !important;
+                min-width: 1.2rem !important;
+                height: 1.2rem !important;
+                line-height: 1.2rem !important;
+                font-size: .75rem !important;
+                /* allow display to be controlled (e.g. .hidden) */
+                text-align: center !important;
+                box-shadow: 0 1px 2px rgba(0,0,0,0.12) !important;
+                border: 1px solid rgba(15,23,36,0.06) !important;
+            }
+            /* Asegurar que el badge posicione correctamente respecto al ícono */
+            #notifications-button .notif-badge,
+            #notifications-button #notification-badge {
+                position: absolute !important;
+                top: -6px !important;
+                right: -8px !important;
+            }
     </style>
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>

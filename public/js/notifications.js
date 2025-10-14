@@ -105,12 +105,27 @@ if (typeof window.RealTimeNotifications === 'undefined') {
 
         updateNotificationCount(count) {
             // Actualizar el contador en el badge
+            // Ensure we cap the display to 99+
+            const displayCount = count > 99 ? '99+' : String(count);
             if (this.notificationBadge) {
                 if (count > 0) {
-                    this.notificationBadge.textContent = count;
+                    this.notificationBadge.textContent = displayCount;
                     this.notificationBadge.classList.remove('hidden');
                 } else {
                     this.notificationBadge.classList.add('hidden');
+                }
+            } else {
+                // If badge element doesn't exist yet and we have notifications, create it
+                if (count > 0) {
+                    const trigger = document.getElementById('notifications-button');
+                    if (trigger) {
+                        const span = document.createElement('span');
+                        span.id = 'notification-badge';
+                        span.className = 'notif-badge';
+                        span.textContent = displayCount;
+                        trigger.appendChild(span);
+                        this.notificationBadge = span;
+                    }
                 }
             }
 

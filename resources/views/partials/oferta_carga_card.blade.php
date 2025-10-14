@@ -63,7 +63,11 @@
                     <span class="badge-darkish" style="color:#ffffff !important; font-weight:500 !important;">{{ $oferta->cargoType->name ?? 'Carga' }}</span>
                     <div class="d-flex align-items-center gap-2">
                         @if ($statusBadge)
-                            <span class="badge bg-{{ $statusBadge['class'] }}">{{ $statusBadge['text'] }}</span>
+                            @if($statusBadge['text']==='Trabajo terminado')
+                                <span class="badge badge-trabajo-terminado-bg">{{ $statusBadge['text'] }}</span>
+                            @else
+                                <span class="badge bg-{{ $statusBadge['class'] }}">{{ $statusBadge['text'] }}</span>
+                            @endif
                         @endif
                         <span class="text-muted">{{ $oferta->created_at->diffForHumans() }}</span>
                         @if ($oferta->es_contenedor)
@@ -115,11 +119,12 @@
 
                 @if ($myAnyBid)
                     @if ($myAnyBid->estado === 'terminado')
-                        <div class="alert alert-warning p-2 mb-3">
+                        {{-- Suave: alerta verde de baja saturación para Trabajo terminado --}}
+                        <div class="alert alert-success-soft p-2 mb-3">
                             <i class="fas fa-info-circle me-1"></i> Ya ofertaste en esta publicación (Trabajo terminado)
                         </div>
                     @else
-                        <div class="alert alert-info p-2 mb-3">
+                        <div class="alert alert-success-soft p-2 mb-3">
                             <i class="fas fa-info-circle me-1"></i> Ya ofertaste en esta publicación
                         </div>
                     @endif
@@ -159,11 +164,11 @@
                     <div class="d-flex justify-content-between mb-2">
                         <span>Ofertas recibidas:</span>
                         @php $bidsCount = $oferta->bids->count(); @endphp
-                        @if($bidsCount > 0)
-                            <span class="badge offer-count">{{ $bidsCount }}</span>
-                        @else
-                            <span class="badge bg-secondary">0</span>
-                        @endif
+                            @if($bidsCount > 0)
+                                <span class="badge offer-count">{{ $bidsCount }}</span>
+                            @else
+                                <span class="badge offer-count">0</span>
+                            @endif
                     </div>
                 </div>
 
@@ -177,7 +182,7 @@
                         @if ($involved && $bidForTracking)
                             {{-- Involucrado en bid bloqueante (aceptado/pendiente_confirmacion/terminado) --}}
                             <a href="{{ route('work.show', $bidForTracking) }}"
-                                class="btn {{ $myBlockingBid && $myBlockingBid->estado === 'terminado' ? 'btn-secondary' : 'btn-success' }}">
+                                class="btn {{ $myBlockingBid && $myBlockingBid->estado === 'terminado' ? 'btn-historico' : 'btn-success' }}">
                                 <i class="fas fa-truck-loading"></i>
                                 {{ $myBlockingBid && $myBlockingBid->estado === 'terminado' ? 'Ver seguimiento (histórico)' : 'Seguimiento' }}
                             </a>

@@ -54,7 +54,7 @@
                                 </thead>
                                 <tbody>
                                     @foreach($bidsRecibidos as $bid)
-                                        <tr>
+                                        <tr data-bid-id="{{ $bid->id }}">
                                             <td>
                                                 <span class="badge rounded-pill bg-{{ $bid->bideable_type == 'App\Models\OfertaCarga' ? 'primary' : 'success' }}">
                                                     <i class="fas fa-{{ $bid->bideable_type == 'App\Models\OfertaCarga' ? 'box' : 'truck' }}"></i>
@@ -134,5 +134,57 @@
         font-size: 0.75rem;
         padding: 0.35em 0.65em;
     }
+        tr[data-bid-id] {
+            transition: background-color 0.3s ease, opacity 0.3s ease, transform 0.3s ease;
+        }
+        tr.row-updated {
+            background-color: rgba(25,135,84,0.08);
+            transform: translateY(-4px);
+        }
 </style>
+@endpush
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    async function updateRows(url, containerSelector) {
+        try {
+            const res = await fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+            const text = await res.text();
+            const tmp = document.createElement('div');
+            tmp.innerHTML = text;
+            const newTbody = tmp.querySelector('tbody');
+            if (!newTbody) return;
+
+            const container = document.querySelector(containerSelector);
+            if (!container) return;
+
+            const existingRows = {};
+            container.querySelectorAll('tr[data-bid-id]').forEach(r => existingRows[r.dataset.bidId] = r);
+
+            newTbody.querySelectorAll('tr[data-bid-id]').forEach(newRow => {
+                const id = newRow.dataset.bidId;
+                const existing = existingRows[id];
+                if (existing) {
+                    if (existing.innerHTML !== newRow.innerHTML) {
+                        existing.innerHTML = newRow.innerHTML;
+                        existing.classList.add('row-updated');
+                        setTimeout(() => existing.classList.remove('row-updated'), 700);
+                    }
+                    delete existingRows[id];
+                } else {
+                    container.appendChild(newRow);
+                    newRow.classList.add('row-updated');
+                    setTimeout(() => newRow.classList.remove('row-updated'), 700);
+                }
+            });
+
+            Object.values(existingRows).forEach(r => r.remove());
+
+        } catch (e) { console.error('updateRows error', e); }
+    }
+
+    setInterval(() => updateRows('/bids/received', '.card .table-responsive tbody'), 1000);
+});
+</script>
 @endpush

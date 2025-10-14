@@ -86,22 +86,28 @@ class OfertaCargaController extends BaseController
     {
         $this->authorize('create', OfertaCarga::class);
 
+        // decimal(8,2) supports up to 999999.99. Validamos para evitar excepciones de BD.
         $validated = $request->validate([
             'tipo_carga'     => 'required|exists:cargo_types,id',
             'origen'         => 'required|string|max:255',
             'destino'        => 'required|string|max:255',
             'fecha_inicio'   => 'required|date',
-            'peso'           => 'required|numeric|min:0',
-            'presupuesto'    => 'required|numeric|min:0',
+            // Aceptamos enteros del lado del cliente; validamos rango y luego convertimos a decimal(8,2)
+            'peso'           => 'required|integer|min:0|max:999999',
+            'presupuesto'    => 'required|integer|min:0|max:999999',
             'descripcion'    => 'nullable|string',
             // nuevos:
-            'unidades'       => 'nullable|integer|min:1',
+            'unidades'       => 'nullable|integer|min:1|max:1000000',
             'es_contenedor'  => 'nullable|boolean',
         ]);
 
         $data = $validated;
         $data['user_id'] = Auth::id();
-        $data['fecha_inicio'] = \Carbon\Carbon::parse($request->fecha_inicio);
+    $data['fecha_inicio'] = \Carbon\Carbon::parse($request->fecha_inicio);
+
+    // Convertir enteros a formato decimal(8,2) para la BD (mostramos sin decimales al usuario)
+    $data['peso'] = isset($data['peso']) ? number_format((float)$data['peso'], 2, '.', '') : null;
+    $data['presupuesto'] = isset($data['presupuesto']) ? number_format((float)$data['presupuesto'], 2, '.', '') : null;
 
         // manejar checkbox nullable: si no viene, queda null
         $data['es_contenedor'] = $request->has('es_contenedor')
@@ -113,10 +119,22 @@ class OfertaCargaController extends BaseController
             ? (int)$request->input('unidades')
             : null;
 
-        $oferta = OfertaCarga::create($data);
+        // Clamp to decimal(8,2) safe range and catch DB errors
+        $maxDecimal = 999999.99;
+        if (isset($data['peso']) && $data['peso'] > $maxDecimal) {
+            // Clamp silently to the DB-safe maximum
+            $data['peso'] = $maxDecimal;
+        }
+        if (isset($data['presupuesto']) && $data['presupuesto'] > $maxDecimal) {
+            // Clamp silently to the DB-safe maximum
+            $data['presupuesto'] = $maxDecimal;
+        }
 
-        // Emitimos publicación nueva
-        event(new NewPublication('carga', [
+        try {
+            $oferta = OfertaCarga::create($data);
+
+            // Emitimos publicación nueva
+            event(new NewPublication('carga', [
             'id'         => $oferta->id,
             'titulo'     => $oferta->cargoType?->name ? ('Carga ' . $oferta->cargoType->name) : "Carga #{$oferta->id}",
             'origen'     => $oferta->origen,
@@ -126,6 +144,11 @@ class OfertaCargaController extends BaseController
             'url'        => route('ofertas_carga.show', $oferta),
             'tipo'       => 'carga',
         ]));
+        } catch (\Illuminate\Database\QueryException $ex) {
+            // Log and return with friendly message
+            \Log::error('OfertaCarga store error: ' . $ex->getMessage(), ['userId' => Auth::id()]);
+            return redirect()->back()->withInput()->withErrors(['presupuesto' => 'El monto ingresado no es válido. Por favor verifique el valor y pruebe de nuevo.']);
+        }
 
         return redirect()->route('ofertas_carga.index')->with([
             'publication_success' => true,
@@ -176,10 +199,10 @@ class OfertaCargaController extends BaseController
             'origen'        => 'required|string|max:255',
             'destino'       => 'required|string|max:255',
             'fecha_inicio'  => 'required|date',
-            'peso'          => 'required|numeric|min:0',
-            'presupuesto'   => 'required|numeric|min:0',
+            'peso'          => 'required|integer|min:0|max:999999',
+            'presupuesto'   => 'required|integer|min:0|max:999999',
             'descripcion'   => 'nullable|string',
-            'unidades'      => 'nullable|integer|min:1',
+            'unidades'      => 'nullable|integer|min:1|max:1000000',
             'es_contenedor' => 'nullable|boolean',
         ]);
 
@@ -195,7 +218,20 @@ class OfertaCargaController extends BaseController
         $data['es_contenedor'] = $request->has('es_contenedor') ? (bool)$request->boolean('es_contenedor') : null;
         $data['unidades']      = $request->filled('unidades') ? (int)$request->input('unidades') : null;
 
-        $oferta->update($data);
+        // Normalizar valores numéricos para ajustarse a decimal(8,2)
+        if (isset($data['peso'])) {
+            $data['peso'] = round((float)$data['peso'], 2);
+        }
+        if (isset($data['presupuesto'])) {
+            $data['presupuesto'] = round((float)$data['presupuesto'], 2);
+        }
+
+        try {
+            $oferta->update($data);
+        } catch (\Illuminate\Database\QueryException $ex) {
+            \Log::error('OfertaCarga update error: ' . $ex->getMessage(), ['oferta_id' => $oferta->id, 'userId' => Auth::id()]);
+            return redirect()->back()->withInput()->withErrors(['presupuesto' => 'No se pudo actualizar la oferta: valor numérico inválido.']);
+        }
 
         return redirect()->route('ofertas_carga.index')->with('success', 'Oferta de carga actualizada exitosamente.');
     }

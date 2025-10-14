@@ -90,6 +90,9 @@
             <div id="publications-list" class="timeline-feed">
                 @foreach ($ofertas as $oferta)
                     @include('partials.oferta_ruta_card', ['oferta' => $oferta])
+                        <a href="{{ route('ofertas.show', $oferta->id) }}" class="btn-historico" style="color:#fff !important;">
+                            <i class="fas fa-route" style="color:inherit !important;"></i> <span style="color:#fff !important;">Ver seguimiento (histórico)</span>
+                        </a>
                 @endforeach
             </div>
         @else
@@ -158,7 +161,7 @@
                 width: 20px;
                 height: 20px;
                 background-color: #fff;
-                border: 3px solid #38a169;
+                border: 3px solid #0f1724;
                 border-radius: 50%;
             }
 
@@ -209,7 +212,7 @@
                 z-index: -1;
                 content: '';
                 display: block;
-                border: 5px solid #28a745;
+                border: 5px solid #0f1724;
             }
 
             .ribbon span {
@@ -217,7 +220,7 @@
                 display: block;
                 width: 225px;
                 padding: 8px 0;
-                background-color: #28a745;
+                background-color: #0f1724;
                 box-shadow: 0 5px 10px rgba(0, 0, 0, .1);
                 color: #fff;
                 font-size: 14px;
@@ -256,7 +259,7 @@
 
             /* Make border more visible for assigned offers */
             .border-success {
-                border: 2px solid #28a745 !important;
+                border: 2px solid #0f1724 !important;
             }
         </style>
     @endpush

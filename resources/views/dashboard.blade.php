@@ -151,7 +151,7 @@
                                 <tbody>
                                     @foreach($misBids as $bid)
                                         @if($bid->bideable)
-                                            <tr>
+                                            <tr data-bid-id="{{ $bid->id }}">
                                                 <td>#{{ $bid->id }}</td>
                                                 <td>
                                                     <span class="badge rounded-pill bg-{{ $bid->bideable_type == 'App\Models\OfertaCarga' ? 'primary' : 'success' }}">
@@ -233,7 +233,7 @@
                                 </thead>
                                 <tbody>
                                     @foreach($bidsRecibidos as $bid)
-                                        <tr>
+                                        <tr data-bid-id="{{ $bid->id }}">
                                             <td>
                                                 <span class="badge rounded-pill bg-{{ $bid->bideable_type == 'App\Models\OfertaCarga' ? 'primary' : 'success' }}">
                                                     <i class="fas fa-{{ $bid->bideable_type == 'App\Models\OfertaCarga' ? 'box' : 'truck' }}"></i>
@@ -357,6 +357,13 @@
     .card:hover {
         box-shadow: 0 5px 15px rgba(0,0,0,0.1);
     }
+    tr[data-bid-id] {
+        transition: background-color 0.3s ease, opacity 0.3s ease, transform 0.3s ease;
+    }
+    tr.row-updated {
+        background-color: rgba(13,110,253,0.06);
+        transform: translateY(-4px);
+    }
 </style>
 @endpush
 
@@ -384,3 +391,85 @@
     });
 </script>
 @endpush
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    // Función genérica para fetch y reemplazo de tbody. Intenta obtener JSON { html } o la página completa y extraer tbody.
+    async function fetchTbody(url, selector) {
+        try {
+            const res = await fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+            const contentType = res.headers.get('content-type') || '';
+            if (contentType.includes('application/json')) {
+                const data = await res.json();
+                if (data.html) {
+                    document.querySelector(selector).innerHTML = data.html;
+                    return;
+                }
+            }
+
+            const text = await res.text();
+            // Extraer el primer <tbody> del HTML retornado
+            const tmp = document.createElement('div');
+            tmp.innerHTML = text;
+            const tbody = tmp.querySelector('tbody');
+            if (tbody) {
+                document.querySelector(selector).innerHTML = tbody.innerHTML;
+            }
+        } catch (e) {
+            // Silenciar errores para no romper la UI; se puede loguear en consola
+            console.error('Error actualizando tabla desde', url, e);
+        }
+    }
+
+    // Actualizar ofertas enviadas y recibidas cada segundo
+    setInterval(function() {
+            // Enviadas: intenta '/bids' y actualiza filas en #bids-enviados
+            updateRows('/bids', '#bids-enviados table tbody');
+            // Recibidas: intenta '/bids/received' y actualiza filas en #bids-recibidos
+            updateRows('/bids/received', '#bids-recibidos table tbody');
+    }, 1000);
+});
+</script>
+@endpush
+
+    @push('scripts')
+    <script>
+    // Función genérica updateRows para dashboard (compartida si se necesita desde otras vistas)
+    async function updateRows(url, selector) {
+        try {
+            const res = await fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+            const text = await res.text();
+            const tmp = document.createElement('div');
+            tmp.innerHTML = text;
+            const newTbody = tmp.querySelector('tbody');
+            if (!newTbody) return;
+
+            const container = document.querySelector(selector);
+            if (!container) return;
+
+            const existingRows = {};
+            container.querySelectorAll('tr[data-bid-id]').forEach(r => existingRows[r.dataset.bidId] = r);
+
+            newTbody.querySelectorAll('tr[data-bid-id]').forEach(newRow => {
+                const id = newRow.dataset.bidId;
+                const existing = existingRows[id];
+                if (existing) {
+                    if (existing.innerHTML !== newRow.innerHTML) {
+                        existing.innerHTML = newRow.innerHTML;
+                        existing.classList.add('row-updated');
+                        setTimeout(() => existing.classList.remove('row-updated'), 700);
+                    }
+                    delete existingRows[id];
+                } else {
+                    container.appendChild(newRow);
+                    newRow.classList.add('row-updated');
+                    setTimeout(() => newRow.classList.remove('row-updated'), 700);
+                }
+            });
+
+            Object.values(existingRows).forEach(r => r.remove());
+        } catch (e) { console.error('dashboard updateRows error', e); }
+    }
+    </script>
+    @endpush

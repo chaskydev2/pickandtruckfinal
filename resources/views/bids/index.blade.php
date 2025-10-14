@@ -56,7 +56,7 @@
                                 <tbody>
                                     @foreach($misBids as $bid)
                                         @if($bid->bideable)
-                                            <tr>
+                                            <tr data-bid-id="{{ $bid->id }}">
                                                 <td class="text-muted">
                                                     #{{ $bid->id }}
                                                 </td>
@@ -126,5 +126,66 @@
         font-size: 0.75rem;
         padding: 0.35em 0.65em;
     }
+        /* transiciones para cambios suaves */
+        tr[data-bid-id] {
+            transition: background-color 0.3s ease, opacity 0.3s ease, transform 0.3s ease;
+        }
+        tr.row-updated {
+            background-color: rgba(13,110,253,0.08);
+            transform: translateY(-4px);
+        }
 </style>
+@endpush
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    // Actualiza filas individualmente comparando por data-bid-id
+    async function updateRows(url, containerSelector) {
+        try {
+            const res = await fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+            const text = await res.text();
+            const tmp = document.createElement('div');
+            tmp.innerHTML = text;
+            const newTbody = tmp.querySelector('tbody');
+            if (!newTbody) return;
+
+            const container = document.querySelector(containerSelector);
+            if (!container) return;
+
+            // Map existing rows
+            const existingRows = {};
+            container.querySelectorAll('tr[data-bid-id]').forEach(r => existingRows[r.dataset.bidId] = r);
+
+            // For each new row, update or insert
+            newTbody.querySelectorAll('tr[data-bid-id]').forEach(newRow => {
+                const id = newRow.dataset.bidId;
+                const existing = existingRows[id];
+                if (existing) {
+                    // If HTML changed, replace innerHTML and animate
+                    if (existing.innerHTML !== newRow.innerHTML) {
+                        existing.innerHTML = newRow.innerHTML;
+                        existing.classList.add('row-updated');
+                        setTimeout(() => existing.classList.remove('row-updated'), 700);
+                    }
+                    delete existingRows[id];
+                } else {
+                    // Insert new row at the end
+                    container.appendChild(newRow);
+                    newRow.classList.add('row-updated');
+                    setTimeout(() => newRow.classList.remove('row-updated'), 700);
+                }
+            });
+
+            // Remove rows that no longer exist
+            Object.values(existingRows).forEach(r => r.remove());
+
+        } catch (e) {
+            console.error('updateRows error', e);
+        }
+    }
+
+    setInterval(() => updateRows('/bids', '.card .table-responsive tbody'), 1000);
+});
+</script>
 @endpush
