@@ -24,7 +24,7 @@ if (Schema::hasTable('empresas')) {
     echo "Columnas existentes: " . implode(', ', $columns) . "\n";
     
     // Verificar si faltan columnas importantes
-    $requiredColumns = ['id', 'user_id', 'nombre', 'logo', 'descripcion', 'telefono', 'direccion', 'sitio_web', 'verificada', 'created_at', 'updated_at'];
+    $requiredColumns = ['id', '_id', 'nombre', 'logo', 'descripcion', 'telefono', 'direccion', 'sitio_web', 'verificada', 'created_at', 'updated_at'];
     $missingColumns = array_diff($requiredColumns, $columns);
     
     if (count($missingColumns) > 0) {
@@ -34,8 +34,8 @@ if (Schema::hasTable('empresas')) {
         echo "Agregando columnas faltantes...\n";
         
         Schema::table('empresas', function (Blueprint $table) use ($missingColumns) {
-            if (in_array('user_id', $missingColumns)) {
-                $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            if (in_array('_id', $missingColumns)) {
+                $table->foreignId('_id')->constrained()->onDelete('cascade');
             }
             if (in_array('nombre', $missingColumns)) {
                 $table->string('nombre');
@@ -75,7 +75,7 @@ if (Schema::hasTable('empresas')) {
     
     Schema::create('empresas', function (Blueprint $table) {
         $table->id();
-        $table->foreignId('user_id')->constrained()->onDelete('cascade');
+        $table->foreignId('_id')->constrained()->onDelete('cascade');
         $table->string('nombre');
         $table->string('logo')->nullable();
         $table->text('descripcion')->nullable();

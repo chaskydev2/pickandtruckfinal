@@ -25,7 +25,7 @@
         <div class="d-flex justify-content-between align-items-center mb-4">
             <div>
                 <h1 class="h3 mb-1">
-                    {{ request()->get('view') === 'mine' ? 'Mis publicaciones' : 'Publicaciones disponibles' }}
+                    {{ request()->get('view') === 'mine' ? 'Mis publicaciones' : 'Publicacioness disponibles' }}
                 </h1>
                 <p class="text-muted">
                     {{ request()->get('view') === 'mine'
@@ -90,8 +90,8 @@
             <div id="publications-list" class="timeline-feed">
                 @foreach ($ofertas as $oferta)
                     @include('partials.oferta_ruta_card', ['oferta' => $oferta])
-                        <a href="{{ route('ofertas.show', $oferta->id) }}" class="btn-historico" style="color:#fff !important;">
-                            <i class="fas fa-route" style="color:inherit !important;"></i> <span style="color:#fff !important;">Ver seguimiento (histórico)</span>
+                        <a href="{{ route('ofertas.show', $oferta->id) }}" class="btn-historico">
+                            <i class="fas fa-route"></i> <span>Ver seguimiento (histórico)</span>
                         </a>
                 @endforeach
             </div>

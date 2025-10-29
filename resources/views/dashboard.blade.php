@@ -83,7 +83,7 @@
                             <div class="card h-100">
                                 <div class="card-header d-flex justify-content-between align-items-center bg-dark text-white">
                                     <h5 class="mb-0 text-white">
-                                        <i class="fas fa-truck me-1"></i> Mis publicaciones de Ruta
+                                        <i class="fas fa-truck me-1"></i> Missss publicaciones de Ruta
                                     </h5>
                                     <a href="{{ route('ofertas.index') }}?view=mine" class="btn btn-sm btn-success text-white">
                                         Ver todas

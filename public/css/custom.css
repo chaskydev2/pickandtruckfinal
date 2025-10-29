@@ -35,20 +35,24 @@ span.badge.bg-secondary.badge-trabajo-terminado {
     color: #fff !important;
     font-weight: bold;
 }
-/* FIX ULTRA-ESPECÍFICO: Forzar blanco en texto e icono de .btn-historico solo en publicaciones */
+/* Historic button: show as plain text (black) with no green highlight in publications */
 .timeline-feed .btn-historico,
 .timeline-feed .btn-historico *,
 .timeline-feed .btn-historico span,
 .timeline-feed .btn-historico i {
-    color: #fff !important;
+    color: #000 !important;
+    background-color: transparent !important;
+    border-color: transparent !important;
 }
 
-/* Al hacer hover, el texto y el icono se invierten a verde success */
+/* Hover: green background and white text */
 .timeline-feed .btn-historico:hover,
 .timeline-feed .btn-historico:hover *,
 .timeline-feed .btn-historico:hover span,
 .timeline-feed .btn-historico:hover i {
-    color: var(--bs-success) !important;
+    color: #f4f2f2 !important;
+    background-color: #22c55e !important;
+    border-color: #22c55e !important;
 }
 /* ===== Notificaciones de chat (toast) ===== */
 .chat-notification {
@@ -108,35 +112,36 @@ span.badge.bg-secondary.badge-trabajo-terminado {
     border-color: rgba(0,104,55,0.08) !important;
 }
 
-/* Botón histórico: fondo bright-green y texto blanco (solicitud de usuario) */
+/* btn-historico: plain link-like appearance, black text and no green highlight */
 .btn-historico {
-    background-color: var(--bs-success) !important; /* match Buscar (success) */
-    border-color: var(--bs-success) !important;
-    color: #ffffff !important;
+    background-color: transparent !important;
+    border: 1px solid transparent !important;
+    color: #000 !important;
     transition: background-color .15s ease-in-out, color .15s ease-in-out, border-color .15s ease-in-out;
 }
 .btn-historico:hover,
 .btn-historico:focus {
-    /* Invert: white background, success-colored text and border */
-    background-color: #ffffff !important;
-    border-color: var(--bs-success) !important;
-    color: var(--bs-success) !important;
+    background-color: #22c55e !important; /* green */
+    border-color: #22c55e !important;
+    color: #faf5f5 !important;
     box-shadow: none !important;
 }
 
-/* Strong override: force white text inside btn-historico by default (specificity + important)
-   This ensures icons and child elements also stay white unless hovered. */
+/* Ensure child elements also show black text when not hovered */
 .btn-historico,
-.btn-historico * {
-    color: #ffffff !important;
+.btn-historico *,
+.btn-historico span,
+.btn-historico i,
+.btn-historico svg {
+    color: #000 !important;
 }
 
-/* Extra: ensure direct text/link children remain white when not hovered (prevents anchor/link color overrides) */
+/* Non-hover children stay black */
 .btn-historico:not(:hover) > *,
 .btn-historico:not(:hover) span,
 .btn-historico:not(:hover) i,
 .btn-historico:not(:hover) svg {
-    color: #ffffff !important;
+    color: #000 !important;
 }
 
 /* Ribbon overrides: ensure assigned/finished ribbon uses the teal/green color */
@@ -463,6 +468,17 @@ span.badge.bg-secondary.badge-trabajo-terminado {
         padding-left: calc(2.25rem * 1.2) !important;
         padding-right: calc(2.25rem * 1.2) !important;
     }
+}
+
+/* Make Bootstrap tooltip text italic (applies to data-bs-toggle="tooltip") */
+.tooltip-inner {
+    font-style: italic !important;
+}
+
+/* More specific: when Bootstrap appends tooltips/popovers to <body> or any container */
+.tooltip .tooltip-inner {
+  font-family: 'Cookie', cursive !important;
+  font-size: 14px;
 }
 
 /* ===== Menú de notificaciones: anchos forzados cross-browser ===== */
