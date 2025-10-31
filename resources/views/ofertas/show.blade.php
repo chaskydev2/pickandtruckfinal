@@ -62,15 +62,7 @@
                                         <h6 class="fw-bold text-muted mb-2">Tipo de Camión</h6>
                                         <p class="mb-0">{{ $oferta->truckType?->name ?? 'No especificado' }}</p>
                                     </div>
-                                    <div class="col-md-6 mb-3">
-                                        <h6 class="fw-bold text-muted mb-2">Estado</h6>
-                                        <p class="mb-0">
-                                            <span
-                                                class="badge bg-{{ $oferta->estado === 'abierta' ? 'success' : 'secondary' }}">
-                                                {{ ucfirst($oferta->estado) }}
-                                            </span>
-                                        </p>
-                                    </div>
+                                    
                                     <div class="col-md-6 mb-3">
                                         <h6 class="fw-bold text-muted mb-2">Capacidad</h6>
                                         <p class="mb-0">{{ number_format($oferta->capacidad, 0) }} kg</p>
@@ -105,7 +97,8 @@
                                 @if (Auth::id() === $oferta->user_id)
                                     <!-- Botones para el dueño de la oferta -->
                                     @can('update', $oferta)
-                                        <a href="{{ route('ofertas.edit', $oferta) }}" class="btn btn-warning">
+                                        <a href="{{ route('ofertas.edit', $oferta) }}" class="btn"
+                                            style="background-color:#22c55e;border-color:#22c55e;color:#ffffff;">
                                             <i class="fas fa-edit me-1"></i> Editar oferta
                                         </a>
                                     @else
@@ -118,7 +111,7 @@
                                         <form action="{{ route('ofertas.destroy', $oferta) }}" method="POST" class="d-inline">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" class="btn btn-danger"
+                                            <button type="submit" class="btn btn-outline-danger"
                                                 onclick="return confirm('¿Está seguro que desea eliminar esta oferta?')">
                                                 <i class="fas fa-trash me-1"></i> Eliminar
                                             </button>
