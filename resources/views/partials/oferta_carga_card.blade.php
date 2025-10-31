@@ -48,7 +48,7 @@
     $bidForTracking = $myBlockingBid ?: $blockingBid;
 @endphp
 
-<div class="card feed-card mb-4 hover-shadow {{ $locked ? 'border-primary' : '' }}">
+<div class="card feed-card mb-4 hover-shadow {{ $locked ? 'border-primary' : '' }}" data-oferta-id="{{ $oferta->id }}">
     @if ($ribbonText)
         <div class="ribbon ribbon-top-right">
             <span>{{ $ribbonText }}</span>

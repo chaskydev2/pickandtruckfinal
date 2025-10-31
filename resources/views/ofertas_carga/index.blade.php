@@ -264,58 +264,7 @@
     @endpush
 
     @push('scripts')
-        <script>
-            document.addEventListener('echo:ready', () => {
-                const list = document.getElementById('publications-list');
-                if (!list || !window.Echo) return;
-
-                window.Echo.channel('publications')
-                    .listen('.publication.created', async (e) => {
-                        if (e.type !== 'carga') return; // esta vista es de CARGA
-                        console.log('[RT carga] recibido .publication.created', e);
-
-                        try {
-                            const url = "{{ route('partials.ofertas_carga.card', ':id') }}".replace(':id', e
-                                .publication.id);
-                .ribbon span {
-                    position: absolute;
-                    display: block;
-                    width: 225px;
-                    padding: 8px 0;
-                    background-color: #0f1724;
-                    box-shadow: 0 5px 10px rgba(0, 0, 0, .1);
-                    color: #fff;
-                    font-size: 14px;
-                    font-weight: 600;
-                    text-shadow: 0 1px 1px rgba(0, 0, 0, .2);
-                    text-transform: uppercase;
-                    text-align: center;
-                }
-                            const html = await fetch(url, {
-                                headers: {
-                .border-primary {
-                    border: 2px solid #0f1724 !important;
-                }
-                            const wrapper = document.createElement('div');
-                            wrapper.innerHTML = html.trim();
-                            const el = wrapper.firstElementChild;
-                            if (!el) return;
-
-                            list.prepend(el);
-                            // animación opcional para la nueva tarjeta
-                            el.classList.add('animate__animated', 'animate__fadeIn');
-                        } catch (err) {
-                            console.error('Error trayendo parcial (carga):', err);
-                        }
-                    });
-            });
-
-            // Por si Echo ya estaba conectado antes de que cargue este script
-            if (window.Echo && window.Echo.connector?.pusher?.connection?.state === 'connected') {
-                document.dispatchEvent(new Event('echo:ready'));
-            }
-        </script>
-
+        <script src="{{ asset('js/publicaciones-realtime.js') }}"></script>
         <script>
             document.addEventListener('DOMContentLoaded', function() {
                 // Animación para las tarjetas

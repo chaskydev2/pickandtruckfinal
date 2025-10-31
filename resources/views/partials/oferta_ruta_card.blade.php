@@ -53,7 +53,7 @@
     $myAnyBid = Auth::check() ? $oferta->bids->sortByDesc('created_at')->firstWhere('user_id', Auth::id()) : null;
 @endphp
 
-<div class="card feed-card mb-4 hover-shadow {{ $locked ? 'border-success' : '' }}">
+<div class="card feed-card mb-4 hover-shadow {{ $locked ? 'border-success' : '' }}" data-oferta-id="{{ $oferta->id }}">
     @if ($ribbonText)
         <div class="ribbon ribbon-top-right">
             <span class="ribbon-trabajo-terminado" @if($ribbonText==="Trabajo terminado") style="color:#fff !important;" @endif>{{ $ribbonText }}</span>
@@ -66,17 +66,21 @@
             <div class="col-md-8 border-end">
                 <div class="d-flex justify-content-between mb-3">
                     <div>
-                        <span class="badge bg-success">{{ $oferta->truckType?->name ?? 'Ruta' }}</span>
+                        <span class="badge-darkish" style="color:#ffffff !important; font-weight:500 !important;">{{ $oferta->truckType?->name ?? 'Ruta' }}</span>
                         @if ($oferta->tipo_despacho)
                             <span class="badge-darkish ms-2" style="color:#ffffff !important; font-weight:500 !important;">{{ $oferta->tipo_despacho_texto }}</span>
                         @endif
                         @if (!is_null($oferta->unidades))
-                            <span class="badge bg-secondary ms-2">{{ number_format($oferta->unidades) }} uds</span>
+                            <span class="badge-darkish ms-2" style="color:#ffffff !important; font-weight:500 !important;">{{ number_format($oferta->unidades) }} uds</span>
                         @endif
                     </div>
                     <div class="d-flex align-items-center gap-2">
                         @if ($statusBadge)
-                            <span class="badge bg-{{ $statusBadge['class'] }}">{{ $statusBadge['text'] }}</span>
+                            @if($statusBadge['text']==='Trabajo terminado')
+                                <span class="badge badge-trabajo-terminado-bg">{{ $statusBadge['text'] }}</span>
+                            @else
+                                <span class="badge bg-{{ $statusBadge['class'] }}">{{ $statusBadge['text'] }}</span>
+                            @endif
                         @endif
                         <span class="text-muted">{{ $oferta->created_at->diffForHumans() }}</span>
                     </div>

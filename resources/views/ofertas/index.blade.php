@@ -35,8 +35,8 @@
             </div>
 
             <div>
-                <a href="{{ route('ofertas.create') }}" class="btn-pickn">
-                    <i class="fas fa-plus"></i> Publicar ruta
+                <a href="{{ route('ofertas.create') }}" class="btn btn-success">
+                    <i class="fas fa-plus me-1"></i> Publicar ruta
                 </a>
             </div>
         </div>
@@ -265,43 +265,7 @@
     @endpush
 
     @push('scripts')
-        <script>
-            document.addEventListener('echo:ready', () => {
-                const list = document.getElementById('publications-list');
-                if (!list || !window.Echo) return;
-
-                window.Echo.channel('publications')
-                    .listen('.publication.created', async (e) => {
-                        if (e.type !== 'ruta') return; // esta vista es de RUTA
-                        console.log('[RT ruta] recibido .publication.created', e);
-
-                        try {
-                            const url = "{{ route('partials.ofertas_ruta.card', ':id') }}".replace(':id', e
-                                .publication.id);
-                            const html = await fetch(url, {
-                                headers: {
-                                    'X-Requested-With': 'XMLHttpRequest'
-                                }
-                            }).then(r => r.text());
-                            const wrapper = document.createElement('div');
-                            wrapper.innerHTML = html.trim();
-                            const el = wrapper.firstElementChild;
-                            if (!el) return;
-
-                            list.prepend(el);
-                            // animación opcional para la nueva tarjeta
-                            el.classList.add('animate__animated', 'animate__fadeIn');
-                        } catch (err) {
-                            console.error('Error trayendo parcial (ruta):', err);
-                        }
-                    });
-            });
-
-            // Por si Echo ya estaba conectado antes de que cargue este script
-            if (window.Echo && window.Echo.connector?.pusher?.connection?.state === 'connected') {
-                document.dispatchEvent(new Event('echo:ready'));
-            }
-        </script>
+        <script src="{{ asset('js/publicaciones-realtime.js') }}"></script>
         <script>
             document.addEventListener('DOMContentLoaded', function() {
                 // Animación para las tarjetas
