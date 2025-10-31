@@ -431,6 +431,13 @@ window.ChatHandler = class ChatHandler {
 
     // Función para mostrar notificaciones al usuario
     showNotification(message, type = 'info') {
+        // Convertir el mensaje a string si es un objeto
+        let messageText = message;
+        if (typeof message === 'object' && message !== null) {
+            // Si es un objeto, intentar extraer un mensaje común
+            messageText = message.message || message.text || message.error || JSON.stringify(message);
+        }
+        
         // Limpiar notificaciones existentes
         this.notificationContainer.innerHTML = '';
 
@@ -439,7 +446,7 @@ window.ChatHandler = class ChatHandler {
         notification.className = `alert alert-${type} alert-dismissible fade show mb-3`;
         notification.role = 'alert';
         notification.innerHTML = `
-            ${message}
+            ${messageText}
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
         `;
 

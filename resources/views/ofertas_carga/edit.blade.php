@@ -1,5 +1,9 @@
 @extends('layouts.app')
 
+@push('styles')
+<link rel="stylesheet" href="{{ asset('css/location-selector.css') }}">
+@endpush
+
 @section('content')
 <div class="container py-5">
     <div class="row justify-content-center">
@@ -27,19 +31,57 @@
                             @enderror
                         </div>
 
-                        <div class="mb-3">
-                            <label for="origen" class="form-label">Origen</label>
-                            <input type="text" class="form-control @error('origen') is-invalid @enderror" id="origen" name="origen" value="{{ $oferta->origen }}" required>
+                        <!-- Selector de Origen -->
+                        <div class="mb-4">
+                            <label class="form-label">Origen <i class="fas fa-question-circle text-muted" data-bs-toggle="tooltip" data-bs-placement="right" title="Seleccione el país, departamento/región y ciudad donde se recoge la carga"></i></label>
+                            <input type="hidden" id="origen" name="origen" class="@error('origen') is-invalid @enderror" value="{{ $oferta->origen }}" required>
+                            
+                            <div class="row g-2">
+                                <div class="col-md-4">
+                                    <select id="origen_pais" class="form-control">
+                                        <option value="">País</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <select id="origen_departamento" class="form-control" disabled>
+                                        <option value="">Departamento/Región</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <select id="origen_ciudad" class="form-control" disabled>
+                                        <option value="">Ciudad</option>
+                                    </select>
+                                </div>
+                            </div>
                             @error('origen')
-                                <div class="invalid-feedback">{{ $message }}</div>
+                                <div class="invalid-feedback d-block">{{ $message }}</div>
                             @enderror
                         </div>
 
-                        <div class="mb-3">
-                            <label for="destino" class="form-label">Destino</label>
-                            <input type="text" class="form-control @error('destino') is-invalid @enderror" id="destino" name="destino" value="{{ $oferta->destino }}" required>
+                        <!-- Selector de Destino -->
+                        <div class="mb-4">
+                            <label class="form-label">Destino <i class="fas fa-question-circle text-muted" data-bs-toggle="tooltip" data-bs-placement="right" title="Seleccione el país, departamento/región y ciudad donde se entrega la carga"></i></label>
+                            <input type="hidden" id="destino" name="destino" class="@error('destino') is-invalid @enderror" value="{{ $oferta->destino }}" required>
+                            
+                            <div class="row g-2">
+                                <div class="col-md-4">
+                                    <select id="destino_pais" class="form-control">
+                                        <option value="">País</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <select id="destino_departamento" class="form-control" disabled>
+                                        <option value="">Departamento/Región</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <select id="destino_ciudad" class="form-control" disabled>
+                                        <option value="">Ciudad</option>
+                                    </select>
+                                </div>
+                            </div>
                             @error('destino')
-                                <div class="invalid-feedback">{{ $message }}</div>
+                                <div class="invalid-feedback d-block">{{ $message }}</div>
                             @enderror
                         </div>
 
@@ -64,7 +106,8 @@
                             <label for="unidades" class="form-label">Unidades</label>
                             <input type="number" min="1" class="form-control @error('unidades') is-invalid @enderror"
                                 id="unidades" name="unidades" 
-                                value="{{ old('unidades', $oferta->unidades) }}"
+                                value="{{ old('unidades', $oferta->unidades ?? 1) }}"
+                                readonly disabled
                                 style="appearance: textfield; -moz-appearance: textfield; -webkit-appearance: textfield;">
                             @error('unidades')
                                 <div class="invalid-feedback">{{ $message }}</div>
@@ -105,49 +148,61 @@
 @endsection
 
 @push('scripts')
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDg5hWgPIKdJBMjLodd5Ttu-f6JRSsw8fY&libraries=places"></script>
+<script src="{{ asset('js/location-data.js') }}"></script>
+<script src="{{ asset('js/location-selector.js') }}"></script>
 <script>
-function initAutocomplete() {
-    // Inicializar autocompletado para origen
-    const origenInput = document.getElementById('origen');
-    const origenAutocomplete = new google.maps.places.Autocomplete(origenInput, {
-        types: ['geocode'],
-        fields: ['formatted_address']
-    });
-
-    // Inicializar autocompletado para destino
-    const destinoInput = document.getElementById('destino');
-    const destinoAutocomplete = new google.maps.places.Autocomplete(destinoInput, {
-        types: ['geocode'],
-        fields: ['formatted_address']
-    });
-
-    // Validación de unidades (no negativas)
-    const unidadesInput = document.getElementById('unidades');
-    if (unidadesInput) {
-        unidadesInput.addEventListener('input', function() {
-            if (this.value !== '' && this.value < 1) this.value = 1;
-        });
+// Inicializar selectores con valores existentes
+document.addEventListener('DOMContentLoaded', function() {
+    const origenValue = "{{ $oferta->origen }}";
+    const destinoValue = "{{ $oferta->destino }}";
+    
+    // Función para parsear y establecer valores
+    function setLocationValue(prefix, value) {
+        if (!value) return;
+        
+        // Parsear el valor: "Ciudad, Departamento, País"
+        const parts = value.split(',').map(p => p.trim());
+        if (parts.length >= 3) {
+            const city = parts[0];
+            const state = parts[1];
+            const country = parts[2];
+            
+            // Establecer país
+            const countrySelect = document.getElementById(`${prefix}_pais`);
+            if (countrySelect) {
+                countrySelect.value = country;
+                countrySelect.dispatchEvent(new Event('change'));
+                
+                // Esperar a que se pueble el select de departamento
+                setTimeout(() => {
+                    const stateSelect = document.getElementById(`${prefix}_departamento`);
+                    if (stateSelect) {
+                        stateSelect.value = state;
+                        stateSelect.dispatchEvent(new Event('change'));
+                        
+                        // Esperar a que se pueble el select de ciudad
+                        setTimeout(() => {
+                            const citySelect = document.getElementById(`${prefix}_ciudad`);
+                            if (citySelect) {
+                                citySelect.value = city;
+                                citySelect.dispatchEvent(new Event('change'));
+                            }
+                        }, 100);
+                    }
+                }, 100);
+            }
+        }
     }
+    
+    // Establecer valores después de que los selectores estén inicializados
+    setTimeout(() => {
+        setLocationValue('origen', origenValue);
+        setLocationValue('destino', destinoValue);
+    }, 200);
+});
+</script>
+<script>
 
-    // Manejar la selección de lugares
-    origenAutocomplete.addListener('place_changed', function() {
-        const place = origenAutocomplete.getPlace();
-        if (place.formatted_address) {
-            origenInput.value = place.formatted_address;
-        }
-    });
-
-    destinoAutocomplete.addListener('place_changed', function() {
-        const place = destinoAutocomplete.getPlace();
-        if (place.formatted_address) {
-            destinoInput.value = place.formatted_address;
-        }
-    });
-}
-
-// Iniciar cuando el DOM esté listo
-document.addEventListener('DOMContentLoaded', initAutocomplete);
 
 // Prevenir el cambio de valor con scroll en campos numéricos
 document.querySelectorAll('input[type=number]').forEach(input => {

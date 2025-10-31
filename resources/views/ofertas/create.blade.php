@@ -1,5 +1,9 @@
 @extends('layouts.app')
 
+@push('styles')
+<link rel="stylesheet" href="{{ asset('css/location-selector.css') }}">
+@endpush
+
 @section('content')
 <div class="container py-5">
     <div class="row justify-content-center">
@@ -19,13 +23,52 @@
                                 @endforeach
                             </select>
                         </div>
+                        <!-- Selector de Origen -->
                         <div class="form-group mb-3">
-                            <label for="origen">Origen <i class="fas fa-question-circle text-muted fst-italic" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-html="true" title="<em>Ciudad o lugar donde inicia la ruta de transporte</em>"></i></label>
-                            <input type="text" id="origen" name="origen" class="form-control" autocomplete="off" required>
+                            <label>Origen <i class="fas fa-question-circle text-muted fst-italic" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-html="true" title="<em>Seleccione el país, departamento/región y ciudad de origen</em>"></i></label>
+                            <input type="hidden" id="origen" name="origen" required>
+                            
+                            <div class="row g-2">
+                                <div class="col-md-4">
+                                    <select id="origen_pais" class="form-control">
+                                        <option value="">País</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <select id="origen_departamento" class="form-control" disabled>
+                                        <option value="">Departamento/Región</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <select id="origen_ciudad" class="form-control" disabled>
+                                        <option value="">Ciudad</option>
+                                    </select>
+                                </div>
+                            </div>
                         </div>
+
+                        <!-- Selector de Destino -->
                         <div class="form-group mb-3">
-                            <label for="destino">Destino <i class="fas fa-question-circle text-muted fst-italic" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-html="true" title="<em>Ciudad o lugar donde finaliza la ruta de transporte</em>"></i></label>
-                            <input type="text" id="destino" name="destino" class="form-control" autocomplete="off" required>
+                            <label>Destino <i class="fas fa-question-circle text-muted fst-italic" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-html="true" title="<em>Seleccione el país, departamento/región y ciudad de destino</em>"></i></label>
+                            <input type="hidden" id="destino" name="destino" required>
+                            
+                            <div class="row g-2">
+                                <div class="col-md-4">
+                                    <select id="destino_pais" class="form-control">
+                                        <option value="">País</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <select id="destino_departamento" class="form-control" disabled>
+                                        <option value="">Departamento/Región</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <select id="destino_ciudad" class="form-control" disabled>
+                                        <option value="">Ciudad</option>
+                                    </select>
+                                </div>
+                            </div>
                         </div>
                         <div class="form-group mb-3">
                             <label for="fecha_inicio">Fecha de Inicio <i class="fas fa-question-circle text-muted fst-italic" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-html="true" title="<em>Fecha en la que estará disponible para iniciar el transporte</em>"></i></label>
@@ -91,6 +134,9 @@
 </div>
 @endsection
 
+@push('scripts')
+<script src="{{ asset('js/location-data.js') }}"></script>
+<script src="{{ asset('js/location-selector.js') }}"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         // Inicializar tooltips
@@ -127,3 +173,4 @@
         }
     });
 </script>
+@endpush

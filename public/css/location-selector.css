@@ -1,0 +1,40 @@
+/* Estilos para los selectores de ubicación */
+.location-selector-group {
+    margin-bottom: 1rem;
+}
+
+.location-selector-group select {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid #ced4da;
+    border-radius: 0.25rem;
+    font-size: 1rem;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.location-selector-group select:disabled {
+    background-color: #e9ecef;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.location-selector-group select:focus {
+    border-color: #80bdff;
+    outline: 0;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.location-selector-group select:required:invalid {
+    border-color: #dc3545;
+}
+
+/* Responsive ajustes */
+@media (max-width: 768px) {
+    .location-selector-group .row {
+        gap: 0.5rem;
+    }
+    
+    .location-selector-group .col-md-4 {
+        margin-bottom: 0.5rem;
+    }
+}

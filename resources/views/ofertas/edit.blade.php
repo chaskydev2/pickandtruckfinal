@@ -1,5 +1,9 @@
 @extends('layouts.app')
 
+@push('styles')
+<link rel="stylesheet" href="{{ asset('css/location-selector.css') }}">
+@endpush
+
 @section('content')
 <div class="container mt-5">
     <h1 class="mb-4 fw-bold">Editar Oferta</h1>
@@ -15,13 +19,52 @@
                 @endforeach
             </select>
         </div>
+        <!-- Selector de Origen -->
         <div class="form-group mb-3">
-            <label for="origen">Origen</label>
-            <input type="text" id="origen" name="origen" class="form-control" value="{{ $oferta->origen }}" required>
+            <label>Origen <i class="fas fa-question-circle text-muted fst-italic" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-html="true" title="<em>Seleccione el país, departamento/región y ciudad de origen</em>"></i></label>
+            <input type="hidden" id="origen" name="origen" value="{{ $oferta->origen }}" required>
+            
+            <div class="row g-2">
+                <div class="col-md-4">
+                    <select id="origen_pais" class="form-control">
+                        <option value="">País</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <select id="origen_departamento" class="form-control" disabled>
+                        <option value="">Departamento/Región</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <select id="origen_ciudad" class="form-control" disabled>
+                        <option value="">Ciudad</option>
+                    </select>
+                </div>
+            </div>
         </div>
+
+        <!-- Selector de Destino -->
         <div class="form-group mb-3">
-            <label for="destino">Destino</label>
-            <input type="text" id="destino" name="destino" class="form-control" value="{{ $oferta->destino }}" required>
+            <label>Destino <i class="fas fa-question-circle text-muted fst-italic" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-html="true" title="<em>Seleccione el país, departamento/región y ciudad de destino</em>"></i></label>
+            <input type="hidden" id="destino" name="destino" value="{{ $oferta->destino }}" required>
+            
+            <div class="row g-2">
+                <div class="col-md-4">
+                    <select id="destino_pais" class="form-control">
+                        <option value="">País</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <select id="destino_departamento" class="form-control" disabled>
+                        <option value="">Departamento/Región</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <select id="destino_ciudad" class="form-control" disabled>
+                        <option value="">Ciudad</option>
+                    </select>
+                </div>
+            </div>
         </div>
         <div class="form-group mb-3">
             <label for="fecha_inicio">Fecha de Inicio</label>
@@ -38,7 +81,8 @@
             <label for="unidades">Unidades</label>
             <input type="number" min="1" id="unidades" name="unidades"
                 class="form-control @error('unidades') is-invalid @enderror"
-                value="{{ old('unidades', $oferta->unidades) }}">
+                value="{{ old('unidades', $oferta->unidades ?? 1) }}"
+                readonly disabled>
             @error('unidades')
                 <div class="invalid-feedback">{{ $message }}</div>
             @enderror
@@ -68,33 +112,60 @@
         <button type="submit" class="btn btn-primary">Actualizar</button>
     </form>
 </div>
-
-<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDg5hWgPIKdJBMjLodd5Ttu-f6JRSsw8fY&libraries=places&callback=initAutocomplete"></script>
-<script>
-    function initAutocomplete() {
-        var origenInput = document.getElementById('origen');
-        var destinoInput = document.getElementById('destino');
-
-        var origenAutocomplete = new google.maps.places.Autocomplete(origenInput);
-        var destinoAutocomplete = new google.maps.places.Autocomplete(destinoInput);
-    }
-
-    document.addEventListener('DOMContentLoaded', function() {
-        if (typeof google !== 'undefined' && google.maps) {
-            initAutocomplete();
-        } else {
-            console.error('Google Maps JavaScript API not loaded.');
-        }
-    });
-
-    // Validación de unidades (no menos de 1 si se ingresa)
-    document.addEventListener('DOMContentLoaded', function () {
-        const unidadesInput = document.getElementById('unidades');
-        if (unidadesInput) {
-            unidadesInput.addEventListener('input', function() {
-                if (this.value !== '' && this.value < 1) this.value = 1;
-            });
-        }
-    });
-</script>
 @endsection
+
+@push('scripts')
+<script src="{{ asset('js/location-data.js') }}"></script>
+<script src="{{ asset('js/location-selector.js') }}"></script>
+<script>
+// Inicializar selectores con valores existentes
+document.addEventListener('DOMContentLoaded', function() {
+    const origenValue = "{{ $oferta->origen }}";
+    const destinoValue = "{{ $oferta->destino }}";
+    
+    // Función para parsear y establecer valores
+    function setLocationValue(prefix, value) {
+        if (!value) return;
+        
+        // Parsear el valor: "Ciudad, Departamento, País"
+        const parts = value.split(',').map(p => p.trim());
+        if (parts.length >= 3) {
+            const city = parts[0];
+            const state = parts[1];
+            const country = parts[2];
+            
+            // Establecer país
+            const countrySelect = document.getElementById(`${prefix}_pais`);
+            if (countrySelect) {
+                countrySelect.value = country;
+                countrySelect.dispatchEvent(new Event('change'));
+                
+                // Esperar a que se pueble el select de departamento
+                setTimeout(() => {
+                    const stateSelect = document.getElementById(`${prefix}_departamento`);
+                    if (stateSelect) {
+                        stateSelect.value = state;
+                        stateSelect.dispatchEvent(new Event('change'));
+                        
+                        // Esperar a que se pueble el select de ciudad
+                        setTimeout(() => {
+                            const citySelect = document.getElementById(`${prefix}_ciudad`);
+                            if (citySelect) {
+                                citySelect.value = city;
+                                citySelect.dispatchEvent(new Event('change'));
+                            }
+                        }, 100);
+                    }
+                }, 100);
+            }
+        }
+    }
+    
+    // Establecer valores después de que los selectores estén inicializados
+    setTimeout(() => {
+        setLocationValue('origen', origenValue);
+        setLocationValue('destino', destinoValue);
+    }, 200);
+});
+</script>
+@endpush

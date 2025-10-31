@@ -111,7 +111,11 @@ window.BidStatusUpdater = class BidStatusUpdater {
                 if (data.bid) {
                     this.updateBidUI(data.bid);
                     if (data.message) {
-                        this.showNotification(data.message, 'info');
+                        // Extraer el contenido del mensaje si es un objeto
+                        const messageContent = typeof data.message === 'object' ? data.message.content : data.message;
+                        if (messageContent) {
+                            this.showNotification(messageContent, 'info');
+                        }
                     }
                 }
             });
@@ -209,6 +213,30 @@ window.BidStatusUpdater = class BidStatusUpdater {
                 this.confirmationAlert.style.display = 'none';
             }
         }
+        
+        // Mostrar/ocultar mensaje de terminado
+        let terminadoAlert = document.querySelector('.alert-success.mt-3');
+        if (bid.estado === 'terminado') {
+            // Si no existe el mensaje de terminado, crearlo
+            if (!terminadoAlert) {
+                terminadoAlert = document.createElement('div');
+                terminadoAlert.className = 'alert alert-success mt-3';
+                terminadoAlert.innerHTML = '<i class="fas fa-check-circle me-2"></i>Este servicio ha sido completado exitosamente y está marcado como terminado.';
+                
+                // Insertarlo después del alert de confirmación o al final del card-body
+                const cardBody = document.querySelector('.card-body');
+                if (cardBody) {
+                    cardBody.appendChild(terminadoAlert);
+                }
+            } else {
+                terminadoAlert.style.display = 'block';
+            }
+        } else {
+            // Ocultar el mensaje si el estado no es terminado
+            if (terminadoAlert) {
+                terminadoAlert.style.display = 'none';
+            }
+        }
 
         // Lógica para deshabilitar el chat
         const messageInput = document.getElementById('message-input');
@@ -217,6 +245,16 @@ window.BidStatusUpdater = class BidStatusUpdater {
             const isDisabled = (bid.estado === 'terminado' || bid.estado === 'cancelado' || bid.estado === 'rechazado');
             messageInput.disabled = isDisabled;
             sendMessageBtn.disabled = isDisabled;
+        }
+        
+        // Actualizar mensaje de chat deshabilitado
+        const chatDisabledMsg = document.querySelector('.form-text.text-center.mt-2');
+        if (chatDisabledMsg) {
+            if (bid.estado === 'terminado') {
+                chatDisabledMsg.style.display = 'block';
+            } else {
+                chatDisabledMsg.style.display = 'none';
+            }
         }
     }
     
@@ -234,6 +272,13 @@ window.BidStatusUpdater = class BidStatusUpdater {
     }
     
     showNotification(message, type = 'info') {
+        // Convertir el mensaje a string si es un objeto
+        let messageText = message;
+        if (typeof message === 'object' && message !== null) {
+            // Si es un objeto, intentar extraer un mensaje común
+            messageText = message.message || message.text || message.error || JSON.stringify(message);
+        }
+        
         let notificationContainer = document.querySelector('.notification-container');
         
         if (!notificationContainer) {
@@ -247,7 +292,7 @@ window.BidStatusUpdater = class BidStatusUpdater {
         notification.className = `alert alert-${type} alert-dismissible fade show`;
         notification.role = 'alert';
         notification.innerHTML = `
-            ${message}
+            ${messageText}
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
         `;
         

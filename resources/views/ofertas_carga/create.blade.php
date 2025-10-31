@@ -1,5 +1,9 @@
 @extends('layouts.app')
 
+@push('styles')
+<link rel="stylesheet" href="{{ asset('css/location-selector.css') }}">
+@endpush
+
 @section('content')
 <div class="container py-5">
     <div class="row justify-content-center">
@@ -23,19 +27,57 @@
                             @enderror
                         </div>
 
+                        <!-- Selector de Origen -->
                         <div class="mb-4">
-                            <label for="origen" class="form-label">Origen <i class="fas fa-question-circle text-muted" data-bs-toggle="tooltip" data-bs-placement="right" title="Ciudad o lugar donde se recoge la carga"></i></label>
-                            <input type="text" class="form-control @error('origen') is-invalid @enderror" id="origen" name="origen" autocomplete="off" required>
+                            <label class="form-label">Origen <i class="fas fa-question-circle text-muted" data-bs-toggle="tooltip" data-bs-placement="right" title="Seleccione el país, departamento/región y ciudad donde se recoge la carga"></i></label>
+                            <input type="hidden" id="origen" name="origen" class="@error('origen') is-invalid @enderror" required>
+                            
+                            <div class="row g-2">
+                                <div class="col-md-4">
+                                    <select id="origen_pais" class="form-control">
+                                        <option value="">País</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <select id="origen_departamento" class="form-control" disabled>
+                                        <option value="">Departamento/Región</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <select id="origen_ciudad" class="form-control" disabled>
+                                        <option value="">Ciudad</option>
+                                    </select>
+                                </div>
+                            </div>
                             @error('origen')
-                                <div class="invalid-feedback">{{ $message }}</div>
+                                <div class="invalid-feedback d-block">{{ $message }}</div>
                             @enderror
                         </div>
 
+                        <!-- Selector de Destino -->
                         <div class="mb-4">
-                            <label for="destino" class="form-label">Destino <i class="fas fa-question-circle text-muted" data-bs-toggle="tooltip" data-bs-placement="right" title="Ciudad o lugar donde se entrega la carga"></i></label>
-                            <input type="text" class="form-control @error('destino') is-invalid @enderror" id="destino" name="destino" autocomplete="off" required>
+                            <label class="form-label">Destino <i class="fas fa-question-circle text-muted" data-bs-toggle="tooltip" data-bs-placement="right" title="Seleccione el país, departamento/región y ciudad donde se entrega la carga"></i></label>
+                            <input type="hidden" id="destino" name="destino" class="@error('destino') is-invalid @enderror" required>
+                            
+                            <div class="row g-2">
+                                <div class="col-md-4">
+                                    <select id="destino_pais" class="form-control">
+                                        <option value="">País</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <select id="destino_departamento" class="form-control" disabled>
+                                        <option value="">Departamento/Región</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <select id="destino_ciudad" class="form-control" disabled>
+                                        <option value="">Ciudad</option>
+                                    </select>
+                                </div>
+                            </div>
                             @error('destino')
-                                <div class="invalid-feedback">{{ $message }}</div>
+                                <div class="invalid-feedback d-block">{{ $message }}</div>
                             @enderror
                         </div>
 
@@ -109,21 +151,10 @@
 @endsection
 
 @push('scripts')
-
+<script src="{{ asset('js/location-data.js') }}"></script>
+<script src="{{ asset('js/location-selector.js') }}"></script>
 <script>
-function initAutocomplete() {
-    const origenInput  = document.getElementById('origen');
-    const destinoInput = document.getElementById('destino');
-
-    if (origenInput && window.google?.maps?.places) {
-        new google.maps.places.Autocomplete(origenInput, { types: ['geocode'] });
-    }
-    if (destinoInput && window.google?.maps?.places) {
-        new google.maps.places.Autocomplete(destinoInput, { types: ['geocode'] });
-    }
-}
-
-// El resto de tu lógica va fuera de initAutocomplete
+// El resto de tu lógica
 document.addEventListener('DOMContentLoaded', function () {
     // Inicializar tooltips de Bootstrap
     var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
