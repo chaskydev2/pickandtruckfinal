@@ -433,7 +433,7 @@
                                                 </thead>
                                                 <tbody>
                                                     @foreach ($oferta->bids as $bid)
-                                                        <tr>
+                                                        <tr data-bid-id="{{ $bid->id }}">
                                                             <td>
                                                                 <div class="d-flex align-items-center">
                                                                     <img src="https://ui-avatars.com/api/?name={{ urlencode($bid->user->name) }}&background=random"
@@ -606,3 +606,7 @@
         </div>
     </div>
 @endsection
+
+@push('scripts')
+<script src="{{ asset('js/ofertas-realtime.js') }}"></script>
+@endpush
