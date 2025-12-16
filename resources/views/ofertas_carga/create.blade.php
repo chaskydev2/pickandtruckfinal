@@ -111,7 +111,16 @@
                             @enderror
                             <div class="form-text">Dejar vacío si no aplica.</div>
                         </div>
-
+                        <div class="form-group mb-3">
+                            <label for="tipo_despacho">Tipo de Despacho Aduanero (Opcional)</label>
+                            <select id="tipo_despacho" name="tipo_despacho" class="form-control">
+                                <option value="" selected>No especificado</option>
+                                <option value="despacho_anticipado" {{ old('tipo_despacho') == 'despacho_anticipado' ? 'selected' : '' }}>Despacho Anticipado</option>
+                                <option value="despacho_general" {{ old('tipo_despacho') == 'despacho_general' ? 'selected' : '' }}>Despacho General</option>
+                                <option value="no_sabe_no_responde" {{ old('tipo_despacho') == 'no_sabe_no_responde' ? 'selected' : '' }}>No sabe/No responde</option>
+                            </select>
+                            <small class="form-text text-muted">Selecciona una opción si aplica a tu ruta.</small>
+                        </div>
                         <div class="mb-4">
                             <label for="descripcion" class="form-label">Comentarios (Opcional) <i class="fas fa-question-circle text-muted" data-bs-toggle="tooltip" data-bs-placement="right" title="Añada detalles adicionales como: requiere refrigeración, es frágil, horarios especiales, etc."></i></label>
                             <textarea class="form-control @error('descripcion') is-invalid @enderror" id="descripcion" name="descripcion" rows="3" placeholder="Ej: La carga requiere refrigeración, frágil, etc.">{{ old('descripcion') }}</textarea>
