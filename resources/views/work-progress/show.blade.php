@@ -154,7 +154,7 @@
                                 <dl class="mb-0">
                                     <dt>Cliente</dt>
                                     <dd>{{ $bid->bideable->user->name }}</dd>
-                                    <dt>Transportista</dt>
+                                    <dt>Compañía de Transporte</dt>
                                     <dd>{{ $bid->user->name }}</dd>
                                 </dl>
                             </div>
@@ -284,7 +284,7 @@
                         @endif
 
                         <hr>
-                        <p class="mb-1"><strong>Comentarios del Transportista:</strong></p>
+                        <p class="mb-1"><strong>Comentarios de la Compañía de Transporte:</strong></p>
                         <div class="alert alert-light mb-0">
                             {{ $bid->comentario ?: 'Sin comentarios adicionales.' }}
                         </div>

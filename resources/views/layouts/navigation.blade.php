@@ -157,10 +157,10 @@
                                                     {{ substr(Auth::user()->empresa->nombre, 0, 1) }}
                                                 </div>
                                             @endif
-                                            <div>{{ Auth::user()->empresa->nombre }}</div>
+                                            <div>{{ Auth::user()->empresa->nombre }} ({{ Auth::user()->role === 'carrier' ? 'TC' : 'FFD' }})</div>
                                         </div>
                                     @else
-                                        <div>{{ Auth::user()->name }}</div>
+                                        <div>{{ Auth::user()->name }} ({{ Auth::user()->role === 'carrier' ? 'TC' : 'FFD' }})</div>
                                     @endif
                                     <div class="ms-1">
                                         <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg"
@@ -258,10 +258,10 @@
                                     {{ substr(Auth::user()->empresa->nombre, 0, 1) }}
                                 </div>
                             @endif
-                            <div class="font-medium text-base text-white">{{ Auth::user()->empresa->nombre }}</div>
+                            <div class="font-medium text-base text-white">{{ Auth::user()->empresa->nombre }} ({{ Auth::user()->role === 'carrier' ? 'TC' : 'FFD' }})</div>
                         </div>
                     @else
-                        <div class="font-medium text-base text-white">{{ Auth::user()->name }}</div>
+                        <div class="font-medium text-base text-white">{{ Auth::user()->name }} ({{ Auth::user()->role === 'carrier' ? 'TC' : 'FFD' }})</div>
                     @endif
                     <div class="font-medium text-sm text-gray-300">{{ Auth::user()->email }}</div>
                 </div>

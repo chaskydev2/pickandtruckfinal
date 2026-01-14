@@ -10,7 +10,7 @@
                 <table class="table table-hover">
                     <thead>
                         <tr>
-                            <th>Transportista</th>
+                            <th>Compañía de Transporte</th>
                             <th>Estado</th>
                             <th>Puja</th>
                             <th>Fecha Propuesta</th>

@@ -105,7 +105,7 @@
                     </h3>
                     <p class="text-muted mb-0">
                         {{ request()->get('view') === 'mine'
-                            ? 'Publica tu primera oferta de carga y conecta con transportistas.'
+                            ? 'Publica tu primera oferta de carga y conecta con compañías de transporte.'
                             : 'Prueba con otros filtros o publica tu propia oferta de carga.' }}
                     </p>
                 </div>

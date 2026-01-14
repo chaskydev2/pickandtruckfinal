@@ -30,9 +30,9 @@
                 <select id="role" name="role" class="form-select mt-1" required>
                     <option value="">Seleccione un tipo de cuenta</option>
                     <option value="{{ App\Models\User::ROLE_FORWARDER }}"
-                        {{ old('role') == App\Models\User::ROLE_FORWARDER ? 'selected' : '' }}>Forwarder</option>
+                        {{ old('role') == App\Models\User::ROLE_FORWARDER ? 'selected' : '' }}>FFD (Freight Forwarder)</option>
                     <option value="{{ App\Models\User::ROLE_CARRIER }}"
-                        {{ old('role') == App\Models\User::ROLE_CARRIER ? 'selected' : '' }}>Carrier</option>
+                        {{ old('role') == App\Models\User::ROLE_CARRIER ? 'selected' : '' }}>TC (Trucking Company)</option>
                 </select>
                 <style>
                     select#role {
@@ -49,6 +49,46 @@
             <x-input-error :messages="$errors->get('role')" class="mt-2" />
             <div class="form-text text-muted mt-1 text-gray-600 hover:text-gray-900 text-sm">
                 Elige el tipo de cuenta que mejor se adapte a tu perfil.
+            </div>
+        </div>
+
+        <!-- Company Information (Only for Trucking Company) -->
+        <div id="companyInformation" style="display: none;">
+            <div class="mt-4 p-4 border border-gray-300 rounded-lg bg-gray-50">
+                <h3 class="text-lg font-semibold mb-3 text-gray-800">Company Information</h3>
+                
+                <!-- Company Name -->
+                <div class="mb-3">
+                    <x-input-label for="company_name" :value="__('Company Name')" />
+                    <x-text-input id="company_name" class="block mt-1 w-full" type="text" name="company_name" 
+                        :value="old('company_name')" autocomplete="organization" />
+                    <x-input-error :messages="$errors->get('company_name')" class="mt-2" />
+                    <div class="form-text text-muted mt-1 text-gray-600 hover:text-gray-900 text-sm">
+                        Ingresa el nombre oficial de tu compañía.
+                    </div>
+                </div>
+
+                <!-- Country -->
+                <div class="mb-3">
+                    <x-input-label for="country" :value="__('Country')" />
+                    <x-text-input id="country" class="block mt-1 w-full" type="text" name="country" 
+                        :value="old('country')" autocomplete="country-name" />
+                    <x-input-error :messages="$errors->get('country')" class="mt-2" />
+                    <div class="form-text text-muted mt-1 text-gray-600 hover:text-gray-900 text-sm">
+                        País donde opera tu compañía.
+                    </div>
+                </div>
+
+                <!-- City -->
+                <div class="mb-3">
+                    <x-input-label for="city" :value="__('City')" />
+                    <x-text-input id="city" class="block mt-1 w-full" type="text" name="city" 
+                        :value="old('city')" autocomplete="address-level2" />
+                    <x-input-error :messages="$errors->get('city')" class="mt-2" />
+                    <div class="form-text text-muted mt-1 text-gray-600 hover:text-gray-900 text-sm">
+                        Ciudad principal de operaciones.
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -180,4 +220,52 @@
         background-color: #1a2b4c !important;
         color: #ffffff !important;
     }
+
+    /* Estilos para el bloque de Company Information */
+    #companyInformation {
+        transition: all 0.3s ease-in-out;
+    }
+
+    #companyInformation .bg-gray-50 {
+        background-color: #f9fafb !important;
+    }
+
+    #companyInformation h3 {
+        color: #1f2937 !important;
+    }
 </style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const roleSelect = document.getElementById('role');
+        const companyInfo = document.getElementById('companyInformation');
+        const companyNameInput = document.getElementById('company_name');
+        const countryInput = document.getElementById('country');
+        const cityInput = document.getElementById('city');
+
+        function toggleCompanyInfo() {
+            const selectedRole = roleSelect.value;
+            const isCarrier = selectedRole === '{{ App\Models\User::ROLE_CARRIER }}';
+            
+            if (isCarrier) {
+                companyInfo.style.display = 'block';
+                // Hacer los campos requeridos si se muestra
+                companyNameInput.setAttribute('required', 'required');
+                countryInput.setAttribute('required', 'required');
+                cityInput.setAttribute('required', 'required');
+            } else {
+                companyInfo.style.display = 'none';
+                // Remover el atributo required si se oculta
+                companyNameInput.removeAttribute('required');
+                countryInput.removeAttribute('required');
+                cityInput.removeAttribute('required');
+            }
+        }
+
+        // Ejecutar al cargar la página (para manejar old() values)
+        toggleCompanyInfo();
+
+        // Ejecutar cuando cambie el select
+        roleSelect.addEventListener('change', toggleCompanyInfo);
+    });
+</script>

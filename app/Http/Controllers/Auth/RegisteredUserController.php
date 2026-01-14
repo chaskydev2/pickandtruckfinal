@@ -30,18 +30,31 @@ class RegisteredUserController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
-        $request->validate([
+        // Validación base
+        $rules = [
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
             'role' => ['required', 'string', 'in:' . User::ROLE_FORWARDER . ',' . User::ROLE_CARRIER],
-        ]);
+        ];
+
+        // Si es Trucking Company, agregar validación para campos de compañía
+        if ($request->role === User::ROLE_CARRIER) {
+            $rules['company_name'] = ['required', 'string', 'max:255'];
+            $rules['country'] = ['required', 'string', 'max:255'];
+            $rules['city'] = ['required', 'string', 'max:255'];
+        }
+
+        $request->validate($rules);
 
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'role' => $request->role,
+            'company_name' => $request->company_name,
+            'country' => $request->country,
+            'city' => $request->city,
         ]);
 
         event(new Registered($user));

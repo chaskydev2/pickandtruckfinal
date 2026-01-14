@@ -7,7 +7,7 @@
             <!-- Navegación de pestañas si el usuario está verificado -->
             @if(auth()->user()->verified)
             <ul class="nav nav-tabs profile-tabs mb-4">
-                <li class="nav-item">
+                <li classs="nav-item">
                     <a class="nav-link profile-tab" href="{{ route('profile.edit') }}">Perfil</a>
                 </li>
                 <li class="nav-item">
@@ -207,6 +207,9 @@
                     </div>
                 </div>
                 
+                 
+                
+
                 @if(!auth()->user()->verified)
                 <div class="card-footer bg-white border-top-0 text-center">
                     <form method="POST" action="{{ route('logout') }}">

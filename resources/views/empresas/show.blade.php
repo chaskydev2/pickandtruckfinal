@@ -46,7 +46,7 @@
                                     <div class="d-inline-block px-3 py-1 mb-2 rounded-pill bg-white bg-opacity-25">
                                         <span class="text-white fw-medium">
                                             <i class="fas {{ $empresa->user->role === 'carrier' ? 'fa-truck' : 'fa-warehouse' }} me-1"></i>
-                                            {{ $empresa->user->role === 'carrier' ? 'Transportista' : 'Forwarder' }}
+                                            {{ $empresa->user->role === 'carrier' ? 'TC (Trucking Company)' : 'FFD (Freight Forwarder)' }}
                                         </span>
                                     </div>
                                     @if($empresa->verificada)
