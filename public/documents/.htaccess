@@ -2,4 +2,11 @@ Options +Indexes
 <IfModule mod_headers.c>
     Header set Access-Control-Allow-Origin "*"
 </IfModule>
+
+<IfModule mod_mime.c>
+    AddType application/pdf .pdf
+    AddType image/jpeg .jpg .jpeg
+    AddType image/png .png
+</IfModule>
+
 Allow from all

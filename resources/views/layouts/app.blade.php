@@ -5,6 +5,9 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    @auth
+    <meta name="user-id" content="{{ auth()->id() }}">
+    @endauth
 
     <title>{{ config('app.name', 'Laravel') }}</title>
 
@@ -18,7 +21,12 @@
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
-    @vite(['resources/css/app.css', 'resources/js/app.js']) {{-- Tailwind / app --}}
+    @if(app()->environment('production'))
+        <link rel="stylesheet" href="/build/assets/app-ROZjW-uj.css">
+        <script type="module" src="/build/assets/app-oYO5InKu.js" defer></script>
+    @else
+        @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @endif
 
     <link href="{{ asset('css/theme.css') }}" rel="stylesheet"> {{-- Tu paleta/variables --}}
     <link href="{{ asset('css/custom.css') }}" rel="stylesheet"> {{-- Ajustes finos al final --}}
@@ -27,6 +35,10 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
         integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <!-- Sistema de notificaciones toast -->
+    <link href="{{ asset('css/toast-notifications.css') }}?v={{ time() }}" rel="stylesheet">
+    <script src="{{ asset('js/toast-notifications.js') }}?v={{ time() }}"></script>
 
     <!-- Cargar chat.js después de app.js -->
     <script src="{{ asset('js/chat.js') }}" defer></script>
@@ -275,6 +287,201 @@
                 top: -6px !important;
                 right: -8px !important;
             }
+
+        /* ============================================
+           TOAST NOTIFICATIONS SYSTEM
+           ============================================ */
+        
+        /* Contenedor de toasts - esquina superior derecha */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            pointer-events: none;
+            max-width: 400px;
+            width: 100%;
+        }
+
+        /* Toast individual */
+        .toast-notification {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0, 0, 0, 0.05);
+            margin-bottom: 12px;
+            pointer-events: auto;
+            opacity: 0;
+            transform: translateX(400px);
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .toast-notification.show {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .toast-notification.hide {
+            opacity: 0;
+            transform: translateX(400px);
+        }
+
+        /* Contenido del toast */
+        .toast-content {
+            display: flex;
+            align-items: flex-start;
+            padding: 16px;
+            gap: 12px;
+        }
+
+        /* Icono del toast */
+        .toast-icon {
+            flex-shrink: 0;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        /* Cuerpo del toast */
+        .toast-body {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .toast-title {
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 4px;
+            color: #1f2937;
+        }
+
+        .toast-message {
+            font-size: 13px;
+            color: #6b7280;
+            line-height: 1.4;
+        }
+
+        /* Botón de cierre */
+        .toast-close {
+            flex-shrink: 0;
+            background: transparent;
+            border: none;
+            padding: 4px;
+            cursor: pointer;
+            color: #9ca3af;
+            transition: color 0.2s;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .toast-close:hover {
+            color: #4b5563;
+        }
+
+        /* Barra de progreso */
+        .toast-progress {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 3px;
+            width: 100%;
+            transform-origin: left;
+        }
+
+        @keyframes toast-progress {
+            from {
+                transform: scaleX(1);
+            }
+            to {
+                transform: scaleX(0);
+            }
+        }
+
+        /* Colores según tipo */
+        .toast-success {
+            border-left: 4px solid #10b981;
+        }
+
+        .toast-success .toast-icon {
+            color: #10b981;
+        }
+
+        .toast-success .toast-progress {
+            background-color: #10b981;
+        }
+
+        .toast-info {
+            border-left: 4px solid #3b82f6;
+        }
+
+        .toast-info .toast-icon {
+            color: #3b82f6;
+        }
+
+        .toast-info .toast-progress {
+            background-color: #3b82f6;
+        }
+
+        .toast-warning {
+            border-left: 4px solid #f59e0b;
+        }
+
+        .toast-warning .toast-icon {
+            color: #f59e0b;
+        }
+
+        .toast-warning .toast-progress {
+            background-color: #f59e0b;
+        }
+
+        .toast-danger {
+            border-left: 4px solid #ef4444;
+        }
+
+        .toast-danger .toast-icon {
+            color: #ef4444;
+        }
+
+        .toast-danger .toast-progress {
+            background-color: #ef4444;
+        }
+
+        .toast-document {
+            border-left: 4px solid #8b5cf6;
+        }
+
+        .toast-document .toast-icon {
+            color: #8b5cf6;
+        }
+
+        .toast-document .toast-progress {
+            background-color: #8b5cf6;
+        }
+
+        /* Responsive */
+        @media (max-width: 640px) {
+            .toast-container {
+                top: 10px;
+                right: 10px;
+                left: 10px;
+                max-width: none;
+            }
+
+            .toast-notification {
+                margin-bottom: 8px;
+            }
+
+            .toast-content {
+                padding: 12px;
+            }
+        }
     </style>
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
@@ -299,7 +506,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 
-    <script src="{{ asset('js/notifications.js') }}"></script>
+    <script src="{{ asset('js/notifications.js') }}?v={{ time() }}"></script>
 
     @stack('scripts')
 

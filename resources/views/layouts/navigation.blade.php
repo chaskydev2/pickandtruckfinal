@@ -1,4 +1,4 @@
-<nav x-data="{ open: false }" class="bg-nav border-b border-gray-700">
+<nav x-data="{ open: false }" class="bg-nav border-b border-gray-700 sticky-nav">
     <!-- Primary Navigation Menu -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
@@ -145,23 +145,24 @@
                             <x-slot name="trigger">
                                 <button
                                     class="flex items-center text-white bg-transparent border-0 rounded-md px-2 py-1 hover:bg-white/10 focus:bg-white/10 focus:outline-none focus:ring-0">
-                                    @if (Auth::user()->empresa)
-                                        <div class="flex items-center">
-                                            @if (Auth::user()->empresa->logo)
-                                                <img src="{{ Auth::user()->empresa->logo }}"
-                                                    alt="{{ Auth::user()->empresa->nombre }}"
-                                                    class="h-6 w-6 rounded-full object-cover mr-2">
-                                            @else
-                                                <div
-                                                    class="h-6 w-6 rounded-full bg-gray-500 flex items-center justify-center mr-2 text-xs text-white">
-                                                    {{ substr(Auth::user()->empresa->nombre, 0, 1) }}
-                                                </div>
-                                            @endif
-                                            <div>{{ Auth::user()->empresa->nombre }} ({{ Auth::user()->role === 'carrier' ? 'TC' : 'FFD' }})</div>
-                                        </div>
-                                    @else
-                                        <div>{{ Auth::user()->name }} ({{ Auth::user()->role === 'carrier' ? 'TC' : 'FFD' }})</div>
-                                    @endif
+                                    @php
+                                        $displayName = Auth::user()->company_name ?? Auth::user()->name;
+                                        $roleLabel = Auth::user()->role === 'carrier' ? 'TC' : 'FFD';
+                                        $initial = substr($displayName, 0, 1);
+                                    @endphp
+                                    <div class="flex items-center">
+                                        @if (Auth::user()->empresa && Auth::user()->empresa->logo)
+                                            <img src="{{ Auth::user()->empresa->logo }}"
+                                                alt="{{ $displayName }}"
+                                                class="h-6 w-6 rounded-full object-cover mr-2">
+                                        @else
+                                            <div
+                                                class="h-6 w-6 rounded-full bg-gray-500 flex items-center justify-center mr-2 text-xs text-white">
+                                                {{ $initial }}
+                                            </div>
+                                        @endif
+                                        <div>{{ $displayName }} ({{ $roleLabel }})</div>
+                                    </div>
                                     <div class="ms-1">
                                         <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg"
                                             viewBox="0 0 20 20" aria-hidden="true">
@@ -185,6 +186,14 @@
                                 <x-dropdown-link :href="route('empresas.show')">
                                     {{ __('Mi Empresa') }}
                                 </x-dropdown-link>
+
+                                @if(Auth::user()->isAdmin())
+                                    <!-- Admin Section -->
+                                    <div class="border-t border-gray-200 my-2"></div>
+                                    <x-dropdown-link :href="route('admin.documents.index')">
+                                        <i class="fas fa-shield-alt me-2"></i>{{ __('Gestión de Documentos') }}
+                                    </x-dropdown-link>
+                                @endif
 
                                 <!-- Authentication -->
                                 <form method="POST" action="{{ route('logout') }}">
@@ -247,22 +256,23 @@
         @auth
             <div class="pt-4 pb-1 border-t border-gray-700">
                 <div class="px-4">
-                    @if (Auth::user()->empresa)
-                        <div class="flex items-center mb-2">
-                            @if (Auth::user()->empresa->logo)
-                                <img src="{{ Auth::user()->empresa->logo }}" alt="{{ Auth::user()->empresa->nombre }}"
-                                    class="h-8 w-8 rounded-full object-cover mr-2">
-                            @else
-                                <div
-                                    class="h-8 w-8 rounded-full bg-gray-500 flex items-center justify-center mr-2 text-sm text-white">
-                                    {{ substr(Auth::user()->empresa->nombre, 0, 1) }}
-                                </div>
-                            @endif
-                            <div class="font-medium text-base text-white">{{ Auth::user()->empresa->nombre }} ({{ Auth::user()->role === 'carrier' ? 'TC' : 'FFD' }})</div>
-                        </div>
-                    @else
-                        <div class="font-medium text-base text-white">{{ Auth::user()->name }} ({{ Auth::user()->role === 'carrier' ? 'TC' : 'FFD' }})</div>
-                    @endif
+                    @php
+                        $displayName = Auth::user()->company_name ?? Auth::user()->name;
+                        $roleLabel = Auth::user()->role === 'carrier' ? 'TC' : 'FFD';
+                        $initial = substr($displayName, 0, 1);
+                    @endphp
+                    <div class="flex items-center mb-2">
+                        @if (Auth::user()->empresa && Auth::user()->empresa->logo)
+                            <img src="{{ Auth::user()->empresa->logo }}" alt="{{ $displayName }}"
+                                class="h-8 w-8 rounded-full object-cover mr-2">
+                        @else
+                            <div
+                                class="h-8 w-8 rounded-full bg-gray-500 flex items-center justify-center mr-2 text-sm text-white">
+                                {{ $initial }}
+                            </div>
+                        @endif
+                        <div class="font-medium text-base text-white">{{ $displayName }} ({{ $roleLabel }})</div>
+                    </div>
                     <div class="font-medium text-sm text-gray-300">{{ Auth::user()->email }}</div>
                 </div>
 

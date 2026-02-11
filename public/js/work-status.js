@@ -174,6 +174,9 @@ window.BidStatusUpdater = class BidStatusUpdater {
     }
     
     updateBidUI(bid) {
+        console.log('Actualizando UI del bid:', bid);
+        
+        // Actualizar badge de estado
         if (this.statusBadge) {
             const statusClass = this.getStatusBadgeClass(bid.estado);
             this.statusBadge.className = `status-badge ${statusClass}`;
@@ -196,21 +199,31 @@ window.BidStatusUpdater = class BidStatusUpdater {
         // Lógica para el alerta y los botones de confirmación
         if (this.confirmationAlert) {
             if (bid.estado === 'pendiente_confirmacion') {
-                this.confirmationAlert.style.display = 'block';
+                // Usar clases de Bootstrap en lugar de style.display
+                this.confirmationAlert.classList.remove('d-none');
+                // Forzar re-render
+                this.confirmationAlert.style.display = '';
                 
-                if (hasUserConfirmed) {
-                    this.confirmationAlertText.textContent = 'Has confirmado la finalización de este trabajo. Esperando confirmación de la otra parte.';
-                    if (this.confirmationButtonsContainer) {
-                        this.confirmationButtonsContainer.style.display = 'none';
-                    }
-                } else if (isOtherUserConfirmed) {
-                    this.confirmationAlertText.textContent = 'La otra parte ha solicitado la finalización de este trabajo. Por favor, confirma o rechaza la solicitud.';
-                    if (this.confirmationButtonsContainer) {
-                        this.confirmationButtonsContainer.style.display = 'block';
+                if (this.confirmationAlertText) {
+                    if (hasUserConfirmed) {
+                        this.confirmationAlertText.textContent = 'Has confirmado la finalización de este trabajo. Esperando confirmación de la otra parte.';
+                        if (this.confirmationButtonsContainer) {
+                            this.confirmationButtonsContainer.classList.add('d-none');
+                        }
+                    } else if (isOtherUserConfirmed) {
+                        this.confirmationAlertText.textContent = 'La otra parte ha solicitado la finalización de este trabajo. Por favor, confirma o rechaza la solicitud.';
+                        if (this.confirmationButtonsContainer) {
+                            this.confirmationButtonsContainer.classList.remove('d-none');
+                        }
+                    } else {
+                        this.confirmationAlertText.textContent = 'Se ha solicitado la finalización de este trabajo. Esperando confirmación.';
+                        if (this.confirmationButtonsContainer) {
+                            this.confirmationButtonsContainer.classList.add('d-none');
+                        }
                     }
                 }
             } else {
-                this.confirmationAlert.style.display = 'none';
+                this.confirmationAlert.classList.add('d-none');
             }
         }
         
@@ -229,12 +242,13 @@ window.BidStatusUpdater = class BidStatusUpdater {
                     cardBody.appendChild(terminadoAlert);
                 }
             } else {
-                terminadoAlert.style.display = 'block';
+                terminadoAlert.classList.remove('d-none');
+                terminadoAlert.style.display = '';
             }
         } else {
             // Ocultar el mensaje si el estado no es terminado
             if (terminadoAlert) {
-                terminadoAlert.style.display = 'none';
+                terminadoAlert.classList.add('d-none');
             }
         }
 

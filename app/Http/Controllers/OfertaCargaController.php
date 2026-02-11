@@ -86,55 +86,36 @@ class OfertaCargaController extends BaseController
     {
         $this->authorize('create', OfertaCarga::class);
 
-        // decimal(8,2) supports up to 999999.99. Validamos para evitar excepciones de BD.
+        // Log para debugging
+        \Log::info('OfertaCarga store request', [
+            'user_id' => Auth::id(),
+            'all_data' => $request->all()
+        ]);
+
+        // Validación simplificada igual a rutas
         $validated = $request->validate([
             'tipo_carga'     => 'required|exists:cargo_types,id',
             'origen'         => 'required|string|max:255',
             'destino'        => 'required|string|max:255',
             'fecha_inicio'   => 'required|date',
-            // Aceptamos enteros del lado del cliente; validamos rango y luego convertimos a decimal(8,2)
-            'peso'           => 'required|integer|min:0|max:999999',
-            'presupuesto'    => 'required|integer|min:0|max:999999',
+            'peso'           => 'required|numeric|min:0',
+            'presupuesto'    => 'required|numeric|min:0',
             'descripcion'    => 'nullable|string',
-            // nuevos:
-            'unidades'       => 'nullable|integer|min:1|max:1000000',
+            'tipo_despacho'  => 'nullable|in:despacho_anticipado,despacho_general,no_sabe_no_responde',
+            'unidades'       => 'nullable|integer|min:1',
             'es_contenedor'  => 'nullable|boolean',
         ]);
 
         $data = $validated;
         $data['user_id'] = Auth::id();
-    $data['fecha_inicio'] = \Carbon\Carbon::parse($request->fecha_inicio);
+        $data['fecha_inicio'] = \Carbon\Carbon::parse($request->fecha_inicio);
+        $data['unidades'] = $request->filled('unidades') ? (int)$request->input('unidades') : null;
+        $data['es_contenedor'] = $request->has('es_contenedor') ? (bool)$request->boolean('es_contenedor') : null;
 
-    // Convertir enteros a formato decimal(8,2) para la BD (mostramos sin decimales al usuario)
-    $data['peso'] = isset($data['peso']) ? number_format((float)$data['peso'], 2, '.', '') : null;
-    $data['presupuesto'] = isset($data['presupuesto']) ? number_format((float)$data['presupuesto'], 2, '.', '') : null;
+        $oferta = OfertaCarga::create($data);
 
-        // manejar checkbox nullable: si no viene, queda null
-        $data['es_contenedor'] = $request->has('es_contenedor')
-            ? (bool)$request->boolean('es_contenedor')
-            : null;
-
-        // si no envían unidades, queda null
-        $data['unidades'] = $request->filled('unidades')
-            ? (int)$request->input('unidades')
-            : null;
-
-        // Clamp to decimal(8,2) safe range and catch DB errors
-        $maxDecimal = 999999.99;
-        if (isset($data['peso']) && $data['peso'] > $maxDecimal) {
-            // Clamp silently to the DB-safe maximum
-            $data['peso'] = $maxDecimal;
-        }
-        if (isset($data['presupuesto']) && $data['presupuesto'] > $maxDecimal) {
-            // Clamp silently to the DB-safe maximum
-            $data['presupuesto'] = $maxDecimal;
-        }
-
-        try {
-            $oferta = OfertaCarga::create($data);
-
-            // Emitimos publicación nueva
-            event(new NewPublication('carga', [
+        // Emitimos publicación nueva
+        event(new NewPublication('carga', [
             'id'         => $oferta->id,
             'titulo'     => $oferta->cargoType?->name ? ('Carga ' . $oferta->cargoType->name) : "Carga #{$oferta->id}",
             'origen'     => $oferta->origen,
@@ -144,11 +125,6 @@ class OfertaCargaController extends BaseController
             'url'        => route('ofertas_carga.show', $oferta),
             'tipo'       => 'carga',
         ]));
-        } catch (\Illuminate\Database\QueryException $ex) {
-            // Log and return with friendly message
-            \Log::error('OfertaCarga store error: ' . $ex->getMessage(), ['userId' => Auth::id()]);
-            return redirect()->back()->withInput()->withErrors(['presupuesto' => 'El monto ingresado no es válido. Por favor verifique el valor y pruebe de nuevo.']);
-        }
 
         return redirect()->route('ofertas_carga.index')->with([
             'publication_success' => true,

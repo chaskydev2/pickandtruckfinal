@@ -11,6 +11,13 @@ class CheckUserStatus
 {
     public function handle(Request $request, Closure $next)
     {
+        // Permitir rutas de broadcasting auth, API y check status sin interferencia
+        if ($request->is('broadcasting/auth') || 
+            $request->is('api/*') ||
+            $request->is('profile/check-document-status')) {
+            return $next($request);
+        }
+        
         if (Auth::check() && Auth::user()->estado === 'Bloqueado') {
             // Guardar email antes de cerrar sesión / revocar token
             $userEmail = Auth::user()->email;

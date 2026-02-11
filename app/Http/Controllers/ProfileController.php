@@ -85,21 +85,43 @@ class ProfileController extends Controller
         return view('profile.documents', compact('requiredDocuments', 'userDocuments'));
     }
 
-    public function uploadDocument(Request $request): RedirectResponse
+    public function uploadDocument(Request $request)
     {
         DB::beginTransaction();
         
         try {
-            $request->validate([
+            // Validar la petición
+            $validator = \Validator::make($request->all(), [
                 'document_id' => 'required|exists:required_documents,id',
                 'document' => 'required|file|mimes:pdf,jpg,jpeg,png|max:2048'
             ]);
+
+            if ($validator->fails()) {
+                DB::rollBack();
+                
+                if ($request->expectsJson() || $request->ajax()) {
+                    return response()->json([
+                        'success' => false,
+                        'error' => $validator->errors()->first()
+                    ], 422);
+                }
+                
+                return back()->withErrors($validator)->withInput();
+            }
 
             $user = Auth::user();
             $file = $request->file('document');
             
             if (!$file->isValid()) {
                 DB::rollBack();
+                
+                if ($request->expectsJson() || $request->ajax()) {
+                    return response()->json([
+                        'success' => false,
+                        'error' => 'El archivo no es válido, por favor inténtelo de nuevo.'
+                    ], 422);
+                }
+                
                 return back()->with('error', 'El archivo no es válido, por favor inténtelo de nuevo.');
             }
             
@@ -118,6 +140,14 @@ class ProfileController extends Controller
                 if (!mkdir($publicPath, 0755, true)) {
                     Log::error("No se pudo crear el directorio: {$publicPath}");
                     DB::rollBack();
+                    
+                    if ($request->expectsJson() || $request->ajax()) {
+                        return response()->json([
+                            'success' => false,
+                            'error' => 'Error al crear directorio para documentos.'
+                        ], 500);
+                    }
+                    
                     return back()->with('error', 'Error al crear directorio para documentos.');
                 }
                 Log::info("Directorio creado: {$publicPath}");
@@ -146,6 +176,14 @@ class ProfileController extends Controller
             } catch (\Exception $e) {
                 Log::error("Error al mover archivo a carpeta pública: " . $e->getMessage());
                 DB::rollBack();
+                
+                if ($request->expectsJson() || $request->ajax()) {
+                    return response()->json([
+                        'success' => false,
+                        'error' => 'Error al guardar el documento. Por favor, inténtelo de nuevo.'
+                    ], 500);
+                }
+                
                 return back()->with('error', 'Error al guardar el documento. Por favor, inténtelo de nuevo.');
             }
             
@@ -169,7 +207,7 @@ class ProfileController extends Controller
                 Log::info("Creando nuevo registro de documento");
             }
             
-            // Actualizar o crear el registro del documento CON DEBUG
+            // Actualizar o crear el registro del documento
             try {
                 $userDoc = UserDocument::updateOrCreate(
                     [
@@ -187,6 +225,14 @@ class ProfileController extends Controller
                 Log::error("Error al guardar en BD: " . $e->getMessage());
                 Log::error("SQL: " . $e->getTraceAsString());
                 DB::rollBack();
+                
+                if ($request->expectsJson() || $request->ajax()) {
+                    return response()->json([
+                        'success' => false,
+                        'error' => 'Error al registrar el documento en la base de datos.'
+                    ], 500);
+                }
+                
                 return back()->with('error', 'Error al registrar el documento en la base de datos.');
             }
 
@@ -199,17 +245,47 @@ class ProfileController extends Controller
             if (!$checkDoc) {
                 Log::error("Verificación post-guardado falló: No se encontró el documento en la BD.");
                 DB::rollBack();
+                
+                if ($request->expectsJson() || $request->ajax()) {
+                    return response()->json([
+                        'success' => false,
+                        'error' => 'El documento se guardó pero no se pudo registrar en la base de datos.'
+                    ], 500);
+                }
+                
                 return back()->with('error', 'El documento se guardó pero no se pudo registrar en la base de datos.');
             }
             
             Log::info("Documento verificado OK: ID {$checkDoc->id}, Path: {$checkDoc->file_path}");
             DB::commit();
 
+            // Devolver JSON si es una petición AJAX
+            if ($request->expectsJson() || $request->ajax()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Documento subido correctamente.',
+                    'document' => [
+                        'id' => $userDoc->id,
+                        'status' => $userDoc->status,
+                        'file_path' => $userDoc->file_path
+                    ]
+                ]);
+            }
+
             return back()->with('success', 'Documento subido correctamente.');
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error("Error general en uploadDocument: " . $e->getMessage());
             Log::error($e->getTraceAsString());
+            
+            // Devolver JSON si es una petición AJAX
+            if ($request->expectsJson() || $request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'error' => 'Error al subir el documento: ' . $e->getMessage()
+                ], 500);
+            }
+            
             return back()->with('error', 'Error al subir el documento: ' . $e->getMessage());
         }
     }
@@ -228,7 +304,38 @@ class ProfileController extends Controller
         return view('profile.document_submission', compact('requiredDocuments', 'userDocuments'));
     }
 
-     /**
+    /**
+     * Verifica si hubo cambios en los documentos del usuario.
+     * Devuelve un hash para que el frontend detecte cambios.
+     */
+    public function checkDocumentStatus(Request $request)
+    {
+        $user = $request->user();
+
+        if (!$user) {
+            return response()->json(['hash' => null], 401);
+        }
+
+        // Obtener documentos del usuario con estado y timestamp
+        $documents = UserDocument::where('user_id', $user->id)
+            ->select('id', 'status', 'updated_at')
+            ->orderBy('id')
+            ->get();
+
+        // Crear un hash del estado actual de documentos
+        $statusString = $documents->map(function($doc) {
+            return $doc->id . ':' . $doc->status . ':' . $doc->updated_at->timestamp;
+        })->implode('|');
+
+        $hash = md5($statusString . '|' . $user->verified);
+
+        return response()->json([
+            'hash' => $hash,
+            'verified' => (bool) $user->verified
+        ]);
+    }
+
+    /**
      * Devuelve el estado de verificación del usuario en JSON.
      * Usado por /user/check-status en el front.
      */

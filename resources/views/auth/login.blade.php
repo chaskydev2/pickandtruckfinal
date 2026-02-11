@@ -4,9 +4,9 @@
         <x-auth-session-status class="mb-4" :status="session('status')" />
         
         @if ($errors->any())
-            <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4 rounded" role="alert">
+            <div style="background-color: #fee; border-left: 4px solid #ef4444; color: #991b1b; padding: 1rem; margin-bottom: 1rem; border-radius: 0.375rem;" role="alert">
                 @foreach ($errors->all() as $error)
-                    <p class="font-bold">{{ $error }}</p>
+                    <p style="font-weight: bold; margin: 0;">{{ $error }}</p>
                 @endforeach
             </div>
         @endif
@@ -36,17 +36,15 @@
 
         <!-- Remember Me -->
         <div class="block mt-4">
-            <label for="remember_me" class="inline-flex items-center" style="background: transparent !important;">
-                <input id="remember_me" type="checkbox" 
-                       class="rounded border-3 border-gray-500 text-indigo-600 shadow-sm focus:ring-0 focus:ring-offset-0 focus:border-blue-600" 
-                       name="remember" 
-                       style="background-color: white !important; 
-                              width: 1.2em; 
-                              height: 1.2em; 
+            <label for="remember_me" style="display: inline-flex; align-items: center; background: transparent !important; cursor: pointer;">
+                <input id="remember_me" type="checkbox" name="remember" 
+                       style="width: 18px; 
+                              height: 18px; 
                               cursor: pointer;
-                              border-color: #6b7280 !important; 
-                              box-shadow: 0 0 0 1px #6b7280;">
-                <span class="ml-3 text-sm text-white font-bold">{{ __('Recordarme') }}</span>
+                              margin: 0;
+                              vertical-align: middle;
+                              accent-color: #3b82f6;">
+                <span style="color: #000 !important; margin-left: 0.75rem; font-size: 0.875rem; font-weight: 600;">{{ __('Recordarme') }}</span>
             </label>
         </div>
 

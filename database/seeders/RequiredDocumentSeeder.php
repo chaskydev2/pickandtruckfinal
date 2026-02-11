@@ -11,27 +11,39 @@ class RequiredDocumentSeeder extends Seeder
     {
         $documents = [
             [
-                'name' => 'DNI',
-                'description' => 'Documento Nacional de Identidad',
-                'notes' => 'Ambos lados, formato PDF o imagen',
+                'name' => 'Copia del carnet de identidad del representante legal',
+                'description' => 'Carnet de identidad del representante legal de la empresa',
+                'notes' => 'Debe estar firmado en el centro. Formato PDF o imagen. Ambos lados.',
                 'active' => true
             ],
             [
-                'name' => 'Licencia de Conducir',
-                'description' => 'Licencia de conducir vigente',
-                'notes' => 'Debe estar vigente al momento de la carga',
+                'name' => 'NIT (certificado de inscripción)',
+                'description' => 'Número de Identificación Tributaria - Certificado de inscripción',
+                'notes' => 'Documento emitido por impuestos. Formato PDF o imagen legible.',
                 'active' => true
             ],
             [
-                'name' => 'SOAT',
-                'description' => 'Seguro Obligatorio de Accidentes de Tránsito',
-                'notes' => 'Vigente y legible',
+                'name' => 'NIT (documento de exhibición)',
+                'description' => 'Número de Identificación Tributaria - Documento de exhibición',
+                'notes' => 'Formato PDF o imagen legible.',
                 'active' => true
             ],
             [
-                'name' => 'Tarjeta de Propiedad',
-                'description' => 'Tarjeta de propiedad del vehículo',
-                'notes' => 'Documento original',
+                'name' => 'Matrícula de Comercio (SEPREC)',
+                'description' => 'Matrícula de comercio emitida por SEPREC',
+                'notes' => 'Debe estar vigente. Formato PDF preferentemente.',
+                'active' => true
+            ],
+            [
+                'name' => 'Certificado de operador de comercio exterior / Licencia de operador de carga',
+                'description' => 'Certificado de operador de comercio exterior o Licencia de operador de carga',
+                'notes' => 'Según corresponda al tipo de empresa. Formato PDF o imagen.',
+                'active' => true
+            ],
+            [
+                'name' => 'Carta de aceptación',
+                'description' => 'Carta de aceptación de términos y condiciones',
+                'notes' => 'Descargue la plantilla desde el botón "Descargar Plantilla", imprima en hoja membretada de su empresa, complete con sus datos, firme, escanee y suba el archivo en formato PDF.',
                 'active' => true
             ]
         ];

@@ -34,16 +34,13 @@ class RegisteredUserController extends Controller
         $rules = [
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
+            'phone' => ['required', 'string', 'max:20'],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
             'role' => ['required', 'string', 'in:' . User::ROLE_FORWARDER . ',' . User::ROLE_CARRIER],
+            'company_name' => ['required', 'string', 'max:255'],
+            'country' => ['required', 'string', 'max:255'],
+            'city' => ['required', 'string', 'max:255'],
         ];
-
-        // Si es Trucking Company, agregar validación para campos de compañía
-        if ($request->role === User::ROLE_CARRIER) {
-            $rules['company_name'] = ['required', 'string', 'max:255'];
-            $rules['country'] = ['required', 'string', 'max:255'];
-            $rules['city'] = ['required', 'string', 'max:255'];
-        }
 
         $request->validate($rules);
 

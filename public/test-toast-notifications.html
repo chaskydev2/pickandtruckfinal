@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prueba de Notificaciones Toast - Pick N Truck</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="../css/toast-notifications.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        .btn-test {
+            width: 100%;
+            padding: 15px;
+            margin-bottom: 12px;
+            font-weight: 600;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+        .btn-test:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        .scroll-demo {
+            height: 600px;
+            overflow-y: auto;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+            background: #f9fafb;
+        }
+        .scroll-content {
+            height: 2000px;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <div class="text-center mb-4">
+            <h1 class="mb-3">🔔 Sistema de Notificaciones Toast</h1>
+            <p class="text-muted">Prueba todas las variantes de notificaciones flotantes</p>
+        </div>
+
+        <div class="row g-3 mb-4">
+            <div class="col-md-6">
+                <button class="btn btn-success btn-test" onclick="testSuccess()">
+                    <i class="fas fa-check-circle me-2"></i> Notificación de Éxito
+                </button>
+            </div>
+            <div class="col-md-6">
+                <button class="btn btn-danger btn-test" onclick="testError()">
+                    <i class="fas fa-exclamation-circle me-2"></i> Notificación de Error
+                </button>
+            </div>
+            <div class="col-md-6">
+                <button class="btn btn-warning btn-test" onclick="testWarning()">
+                    <i class="fas fa-exclamation-triangle me-2"></i> Notificación de Advertencia
+                </button>
+            </div>
+            <div class="col-md-6">
+                <button class="btn btn-info btn-test text-white" onclick="testInfo()">
+                    <i class="fas fa-info-circle me-2"></i> Notificación de Información
+                </button>
+            </div>
+            <div class="col-md-6">
+                <button class="btn btn-primary btn-test" onclick="testDocument()">
+                    <i class="fas fa-file-alt me-2"></i> Documento Aprobado
+                </button>
+            </div>
+            <div class="col-md-6">
+                <button class="btn btn-dark btn-test" onclick="testBid()">
+                    <i class="fas fa-hand-holding-usd me-2"></i> Nueva Oferta
+                </button>
+            </div>
+        </div>
+
+        <div class="alert alert-info">
+            <i class="fas fa-lightbulb me-2"></i>
+            <strong>Tip:</strong> Las notificaciones aparecerán en la esquina superior derecha y 
+            permanecerán visibles incluso si haces scroll hacia abajo.
+        </div>
+
+        <button class="btn btn-outline-primary w-100 mb-3" onclick="testMultiple()">
+            <i class="fas fa-layer-group me-2"></i> Probar Múltiples Notificaciones
+        </button>
+
+        <button class="btn btn-outline-secondary w-100 mb-3" onclick="testBrowserNotification()">
+            <i class="fas fa-bell me-2"></i> Probar Notificación del Navegador
+        </button>
+
+        <div class="scroll-demo">
+            <div class="scroll-content">
+                <h4 class="mb-3">📋 Área de Scroll para Pruebas</h4>
+                <p>Haz scroll hacia abajo dentro de esta área y luego presiona los botones de arriba.</p>
+                <p>Las notificaciones toast seguirán apareciendo en la esquina superior derecha de la ventana,
+                   <strong>incluso si estás scrolleado hacia abajo.</strong></p>
+                
+                <div class="alert alert-success mt-4">
+                    <h5>✅ Características del Sistema:</h5>
+                    <ul class="mb-0">
+                        <li>Notificaciones flotantes siempre visibles (posición fixed)</li>
+                        <li>Múltiples estilos según tipo de notificación</li>
+                        <li>Animaciones suaves de entrada y salida</li>
+                        <li>Cierre automático configurable</li>
+                        <li>Botón de cerrar manual</li>
+                        <li>Compatible con notificaciones del navegador</li>
+                        <li>Responsive en móviles</li>
+                        <li>Máximo 5 notificaciones simultáneas</li>
+                    </ul>
+                </div>
+
+                <div style="height: 800px; display: flex; align-items: center; justify-content: center; background: #e5e7eb; border-radius: 8px; margin-top: 20px;">
+                    <div class="text-center p-4">
+                        <i class="fas fa-arrow-down fa-3x text-secondary mb-3"></i>
+                        <h3>Sigue haciendo scroll...</h3>
+                        <p class="text-muted">Las notificaciones se mantienen visibles</p>
+                    </div>
+                </div>
+
+                <div class="alert alert-warning mt-4">
+                    <h5>⚠️ Importante:</h5>
+                    <p class="mb-0">Para las notificaciones del navegador, necesitas dar permisos la primera vez que las uses. El sistema solicitará permiso automáticamente al hacer el primer click en la página.</p>
+                </div>
+
+                <div style="height: 400px; display: flex; align-items: flex-end; justify-content: center;">
+                    <button class="btn btn-lg btn-success" onclick="testSuccess()">
+                        <i class="fas fa-check-circle me-2"></i> Probar desde aquí abajo
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/toast-notifications.js"></script>
+    <script>
+        function testSuccess() {
+            showToastNotification(
+                'Documento Aprobado',
+                'Tu licencia de conducir ha sido aprobada exitosamente.',
+                'success',
+                5000
+            );
+        }
+
+        function testError() {
+            showToastNotification(
+                'Error al Guardar',
+                'No se pudo guardar el documento. Por favor intenta nuevamente.',
+                'danger',
+                6000
+            );
+        }
+
+        function testWarning() {
+            showToastNotification(
+                'Advertencia de Perfil',
+                'Tu perfil está incompleto. Completa tus datos para recibir más ofertas.',
+                'warning',
+                7000
+            );
+        }
+
+        function testInfo() {
+            showToastNotification(
+                'Nueva Actualización',
+                'Hay una nueva versión de la plataforma disponible.',
+                'info',
+                5000
+            );
+        }
+
+        function testDocument() {
+            showToastNotification(
+                'Documento Validado',
+                'Tu SOAT ha sido verificado y aprobado por el administrador.',
+                'document',
+                6000
+            );
+        }
+
+        function testBid() {
+            showToastNotification(
+                'Nueva Oferta Recibida',
+                'Juan Pérez te ha enviado una oferta de $5,000.00 para tu ruta La Paz - Cochabamba.',
+                'success',
+                8000
+            );
+        }
+
+        function testMultiple() {
+            setTimeout(() => testSuccess(), 100);
+            setTimeout(() => testWarning(), 300);
+            setTimeout(() => testInfo(), 500);
+            setTimeout(() => testDocument(), 700);
+        }
+
+        function testBrowserNotification() {
+            if ('Notification' in window) {
+                if (Notification.permission === 'granted') {
+                    new Notification('PICK N TRUCK', {
+                        body: 'Esta es una notificación del navegador de prueba.',
+                        icon: '../images/logo.png',
+                        tag: 'test-notification'
+                    });
+                    showSuccessToast('Notificación del navegador enviada');
+                } else if (Notification.permission !== 'denied') {
+                    Notification.requestPermission().then(permission => {
+                        if (permission === 'granted') {
+                            new Notification('PICK N TRUCK', {
+                                body: 'Permisos concedidos! Esta es una notificación de prueba.',
+                                icon: '../images/logo.png'
+                            });
+                            showSuccessToast('Permisos concedidos');
+                        } else {
+                            showWarningToast('Permisos denegados para notificaciones del navegador');
+                        }
+                    });
+                } else {
+                    showWarningToast('Los permisos de notificación del navegador están bloqueados');
+                }
+            } else {
+                showErrorToast('Tu navegador no soporta notificaciones');
+            }
+        }
+
+        // Mostrar mensaje de bienvenida al cargar
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                showToastNotification(
+                    '¡Bienvenido!',
+                    'Sistema de notificaciones toast cargado correctamente. Prueba los botones de arriba.',
+                    'info',
+                    6000
+                );
+            }, 500);
+        });
+    </script>
+</body>
+</html>

@@ -28,26 +28,28 @@ class RegisterController extends Controller
         return Validator::make($data, [
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+            'phone' => ['required', 'string', 'max:20'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
-            'empresa_nombre' => ['required', 'string', 'max:255'],
-            'empresa_logo' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif', 'max:2048'],
-            'empresa_descripcion' => ['nullable', 'string'],
-            'empresa_telefono' => ['nullable', 'string', 'max:20'],
-            'empresa_direccion' => ['nullable', 'string', 'max:255'],
-            'empresa_sitio_web' => ['nullable', 'string', 'max:255'],
+            'role' => ['required', 'in:forwarder,carrier'],
+            // Campos de empresa ahora requeridos para todos
+            'company_name' => ['required', 'string', 'max:255'],
+            'country' => ['required', 'string', 'max:255'],
+            'city' => ['required', 'string', 'max:255'],
         ], [
             // Mensajes personalizados en español
             'name.required' => 'El nombre es obligatorio',
             'email.required' => 'El correo electrónico es obligatorio',
             'email.email' => 'Debe ingresar un correo electrónico válido',
             'email.unique' => 'Este correo electrónico ya está registrado',
+            'phone.required' => 'El número de teléfono es obligatorio',
             'password.required' => 'La contraseña es obligatoria',
             'password.min' => 'La contraseña debe tener al menos 8 caracteres',
             'password.confirmed' => 'Las contraseñas no coinciden',
-            'empresa_nombre.required' => 'El nombre de la empresa es obligatorio',
-            'empresa_logo.image' => 'El logo debe ser una imagen',
-            'empresa_logo.mimes' => 'El logo debe ser un archivo de tipo: jpeg, png, jpg, gif',
-            'empresa_logo.max' => 'El logo no debe ser mayor a 2MB',
+            'role.required' => 'Debe seleccionar un tipo de cuenta',
+            'role.in' => 'El tipo de cuenta seleccionado no es válido',
+            'company_name.required' => 'El nombre de la empresa es obligatorio',
+            'country.required' => 'El país es obligatorio',
+            'city.required' => 'La ciudad es obligatoria',
         ]);
     }
 
@@ -59,12 +61,17 @@ class RegisterController extends Controller
      */
     protected function create(array $data)
     {
-        // Crear el usuario con estado 'Activo' por defecto
+        // Crear el usuario con estado 'Activo' y el rol seleccionado
         $user = User::create([
             'name' => $data['name'],
             'email' => $data['email'],
+            'phone' => $data['phone'],
             'password' => Hash::make($data['password']),
+            'role' => $data['role'],
             'estado' => 'Activo',
+            'company_name' => $data['company_name'],
+            'country' => $data['country'],
+            'city' => $data['city'],
         ]);
         
         return $user;
@@ -83,49 +90,27 @@ class RegisterController extends Controller
 
         event(new Registered($user = $this->create($request->all())));
 
-        // Procesar la empresa después de crear el usuario
-        try {
-            $logoUrl = null;
-            
-            // Procesar el logo si se ha proporcionado
-            if ($request->hasFile('empresa_logo') && $request->file('empresa_logo')->isValid()) {
-                $file = $request->file('empresa_logo');
-                $fileName = uniqid() . '_' . $user->id . '_' . time() . '.' . $file->getClientOriginalExtension();
+        // Procesar la empresa después de crear el usuario (solo si es carrier)
+        if ($request->role === 'carrier') {
+            try {
+                // Crear la empresa asociada al usuario
+                Empresa::create([
+                    'user_id' => $user->id,
+                    'nombre' => $request->company_name,
+                    'logo' => null, // Logo se puede agregar después en el perfil
+                    'descripcion' => null,
+                    'telefono' => null,
+                    'direccion' => $request->city . ', ' . $request->country,
+                    'sitio_web' => null,
+                    'verificada' => false,
+                ]);
                 
-                // Directorio para logos de empresas
-                $directory = 'empresas/logos';
-                $publicPath = public_path($directory);
+                Log::info("Empresa creada exitosamente para el usuario: {$user->id}");
                 
-                // Asegurar que el directorio existe
-                if (!file_exists($publicPath)) {
-                    if (!mkdir($publicPath, 0755, true)) {
-                        Log::error("No se pudo crear el directorio: {$publicPath}");
-                    }
-                }
-                
-                // Mover el archivo al directorio público
-                $file->move($publicPath, $fileName);
-                
-                // URL completa para el logo
-                //$baseUrl = 'https://app.pickntruck.com/';
-                $baseUrl = config('app.url') . '/';
-                $logoUrl = $directory . '/' . $fileName;
+            } catch (\Exception $e) {
+                Log::error("Error al crear empresa en el registro: " . $e->getMessage());
+                Log::error("Stack trace: " . $e->getTraceAsString());
             }
-            
-            // Crear la empresa asociada al usuario
-            Empresa::create([
-                'user_id' => $user->id,
-                'nombre' => $request->empresa_nombre,
-                'logo' => $logoUrl,
-                'descripcion' => $request->empresa_descripcion,
-                'telefono' => $request->empresa_telefono,
-                'direccion' => $request->empresa_direccion,
-                'sitio_web' => $request->empresa_sitio_web,
-                'verificada' => false,
-            ]);
-            
-        } catch (\Exception $e) {
-            Log::error("Error al crear empresa en el registro: " . $e->getMessage());
         }
 
         $this->guard()->login($user);

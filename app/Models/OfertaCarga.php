@@ -21,6 +21,7 @@ class OfertaCarga extends Model
         'peso',
         'presupuesto',
         'descripcion',
+        'tipo_despacho',
         'unidades',
         'es_contenedor',
         'expiry_notification_sent_at',

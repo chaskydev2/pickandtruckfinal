@@ -77,11 +77,19 @@ class EmpresaController extends Controller
         
         $validatedData = $request->validate([
             'nombre' => 'required|string|max:255',
-            'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'logo' => [
+                'nullable',
+                'image',
+                'mimes:jpeg,png,jpg,gif',
+                'max:2048',
+                'dimensions:ratio=1/1',
+            ],
             'descripcion' => 'nullable|string',
             'telefono' => 'nullable|string|max:20',
             'direccion' => 'nullable|string|max:255',
             'sitio_web' => 'nullable|string|max:255',
+        ], [
+            'logo.dimensions' => 'El logo debe ser una imagen cuadrada (mismo ancho y alto). Ejemplo: 300x300px, 500x500px, etc.',
         ]);
 
         // Procesar el logo si se subió uno nuevo

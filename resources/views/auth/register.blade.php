@@ -23,6 +23,17 @@
             </div>
         </div>
 
+        <!-- Phone Number -->
+        <div class="mt-4">
+            <x-input-label for="phone" :value="__('Número de Teléfono')" />
+            <x-text-input id="phone" class="block mt-1 w-full" type="tel" name="phone" :value="old('phone')"
+                required autocomplete="tel" />
+            <x-input-error :messages="$errors->get('phone')" class="mt-2" />
+            <div class="form-text text-muted mt-1 text-gray-600 hover:text-gray-900 text-sm">
+                Ingresa tu número de teléfono con código de país.
+            </div>
+        </div>
+
         <!-- Role Selection -->
         <div class="mt-4">
             <x-input-label for="role" :value="__('Tipo de cuenta')" />
@@ -52,8 +63,8 @@
             </div>
         </div>
 
-        <!-- Company Information (Only for Trucking Company) -->
-        <div id="companyInformation" style="display: none;">
+        <!-- Company Information -->
+        <div id="companyInformation">
             <div class="mt-4 p-4 border border-gray-300 rounded-lg bg-gray-50">
                 <h3 class="text-lg font-semibold mb-3 text-gray-800">Company Information</h3>
                 
@@ -61,7 +72,7 @@
                 <div class="mb-3">
                     <x-input-label for="company_name" :value="__('Company Name')" />
                     <x-text-input id="company_name" class="block mt-1 w-full" type="text" name="company_name" 
-                        :value="old('company_name')" autocomplete="organization" />
+                        :value="old('company_name')" required autocomplete="organization" />
                     <x-input-error :messages="$errors->get('company_name')" class="mt-2" />
                     <div class="form-text text-muted mt-1 text-gray-600 hover:text-gray-900 text-sm">
                         Ingresa el nombre oficial de tu compañía.
@@ -72,7 +83,7 @@
                 <div class="mb-3">
                     <x-input-label for="country" :value="__('Country')" />
                     <x-text-input id="country" class="block mt-1 w-full" type="text" name="country" 
-                        :value="old('country')" autocomplete="country-name" />
+                        :value="old('country')" required autocomplete="country-name" />
                     <x-input-error :messages="$errors->get('country')" class="mt-2" />
                     <div class="form-text text-muted mt-1 text-gray-600 hover:text-gray-900 text-sm">
                         País donde opera tu compañía.
@@ -83,7 +94,7 @@
                 <div class="mb-3">
                     <x-input-label for="city" :value="__('City')" />
                     <x-text-input id="city" class="block mt-1 w-full" type="text" name="city" 
-                        :value="old('city')" autocomplete="address-level2" />
+                        :value="old('city')" required autocomplete="address-level2" />
                     <x-input-error :messages="$errors->get('city')" class="mt-2" />
                     <div class="form-text text-muted mt-1 text-gray-600 hover:text-gray-900 text-sm">
                         Ciudad principal de operaciones.
@@ -236,36 +247,6 @@
 </style>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const roleSelect = document.getElementById('role');
-        const companyInfo = document.getElementById('companyInformation');
-        const companyNameInput = document.getElementById('company_name');
-        const countryInput = document.getElementById('country');
-        const cityInput = document.getElementById('city');
-
-        function toggleCompanyInfo() {
-            const selectedRole = roleSelect.value;
-            const isCarrier = selectedRole === '{{ App\Models\User::ROLE_CARRIER }}';
-            
-            if (isCarrier) {
-                companyInfo.style.display = 'block';
-                // Hacer los campos requeridos si se muestra
-                companyNameInput.setAttribute('required', 'required');
-                countryInput.setAttribute('required', 'required');
-                cityInput.setAttribute('required', 'required');
-            } else {
-                companyInfo.style.display = 'none';
-                // Remover el atributo required si se oculta
-                companyNameInput.removeAttribute('required');
-                countryInput.removeAttribute('required');
-                cityInput.removeAttribute('required');
-            }
-        }
-
-        // Ejecutar al cargar la página (para manejar old() values)
-        toggleCompanyInfo();
-
-        // Ejecutar cuando cambie el select
-        roleSelect.addEventListener('change', toggleCompanyInfo);
-    });
+    // Company Information is now always visible for both roles
+    // No need for toggle logic
 </script>

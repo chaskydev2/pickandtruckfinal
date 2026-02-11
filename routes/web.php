@@ -1,6 +1,7 @@
 <?php declare(strict_types=1);
 
 use Illuminate\Support\Facades\Broadcast;
+use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\BlockedController;
 use App\Http\Controllers\OfertaRutaController;
@@ -12,9 +13,11 @@ use App\Http\Controllers\WorkProgressController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\EmpresaController;
 use App\Http\Controllers\WorkController;
+use App\Http\Controllers\AdminDocumentController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Middleware\VerifiedUser;
 use App\Http\Middleware\CheckUserStatus;
+use App\Http\Middleware\IsAdmin;
 
 
 require __DIR__.'/auth.php';
@@ -27,12 +30,14 @@ Route::middleware(['auth', CheckUserStatus::class])->group(function () {
     Route::get('/user/check-status', [ProfileController::class, 'checkStatus'])->name('user.checkStatus');
     
     Route::get('/profile/document-submission', [ProfileController::class, 'documentSubmission'])
-        ->name('profile.document-submission')
-        ->withoutMiddleware(\App\Http\Middleware\ServeStorageFiles::class);
+        ->name('profile.document-submission');
     
     Route::post('/profile/documents/upload', [ProfileController::class, 'uploadDocument'])
-        ->name('profile.upload-document')
-        ->withoutMiddleware(\App\Http\Middleware\ServeStorageFiles::class);
+        ->name('profile.upload-document');
+    
+    // Ruta para verificar cambios en documentos (auto-refresh)
+    Route::get('/profile/check-document-status', [ProfileController::class, 'checkDocumentStatus'])
+        ->name('profile.check-document-status');
     
     Route::post('/logout', [App\Http\Controllers\Auth\AuthenticatedSessionController::class, 'destroy'])->name('logout');
 });
@@ -116,11 +121,9 @@ Route::middleware(['auth', VerifiedUser::class])->group(function () {
 
     Route::prefix('notifications')->name('notifications.')->group(function () {
         Route::get('/', [NotificationController::class, 'index'])->name('index');
-        // CORRECCIÓN: Usar Route::get y Route::post
-        Route::get('/check', [NotificationController::class, 'check'])->name('check')->withoutMiddleware(\App\Http\Middleware\ServeStorageFiles::class);
-        Route::post('/{id}/read', [NotificationController::class, 'markAsRead'])->name('read')->withoutMiddleware(\App\Http\Middleware\ServeStorageFiles::class);
-        Route::post('/mark-all-read', [NotificationController::class, 'markAllAsRead'])->name('markAllRead')->withoutMiddleware(\App\Http\Middleware\ServeStorageFiles::class);
-        
+        Route::get('/check', [NotificationController::class, 'check'])->name('check');
+        Route::post('/{id}/read', [NotificationController::class, 'markAsRead'])->name('read');
+        Route::post('/mark-all-read', [NotificationController::class, 'markAllAsRead'])->name('markAllRead');
         Route::get('/test-send', [NotificationController::class, 'testSend'])->name('test-send');
     });
 
@@ -136,10 +139,47 @@ Route::get('/contactar-admin', [\App\Http\Controllers\AccountController::class, 
 Route::get('storage/{path}', function($path) {
     $filePath = public_path('storage/' . $path);
     if (file_exists($filePath)) {
-        return response()->file($filePath);
+        return response()->download($filePath, basename($filePath), [
+            'Content-Type' => mime_content_type($filePath),
+        ]);
     }
     abort(404);
 })->where('path', '.*');
+
+// Ruta para servir documentos subidos por usuarios
+Route::get('documents/{path}', function($path) {
+    $filePath = public_path('documents/' . $path);
+    if (file_exists($filePath)) {
+        return response()->download($filePath, basename($filePath), [
+            'Content-Type' => mime_content_type($filePath),
+        ]);
+    }
+    abort(404);
+})->where('path', '.*');
+
+// Ruta para servir templates y otros archivos estáticos
+Route::get('templates/{filename}', function($filename) {
+    $filePath = public_path('templates/' . $filename);
+    if (file_exists($filePath)) {
+        return response()->download($filePath, $filename, [
+            'Content-Type' => mime_content_type($filePath),
+        ]);
+    }
+    abort(404);
+});
+
+// Admin routes for document management
+Route::middleware(['auth', CheckUserStatus::class, IsAdmin::class])->prefix('admin')->name('admin.')->group(function () {
+    // Document management routes
+    Route::prefix('documents')->name('documents.')->group(function () {
+        Route::get('/', [AdminDocumentController::class, 'index'])->name('index');
+        Route::get('/user/{userId}', [AdminDocumentController::class, 'userDocuments'])->name('user');
+        Route::post('/{document}/update-status', [AdminDocumentController::class, 'updateStatus'])->name('update-status');
+        Route::post('/{document}/approve', [AdminDocumentController::class, 'approve'])->name('approve');
+        Route::post('/{document}/reject', [AdminDocumentController::class, 'reject'])->name('reject');
+        Route::get('/pending-count', [AdminDocumentController::class, 'pendingCount'])->name('pending-count');
+    });
+});
 
 Route::fallback(function () {
     return redirect()->route('home');

@@ -7,7 +7,7 @@
             <!-- Navegación de pestañas si el usuario está verificado -->
             @if(auth()->user()->verified)
             <ul class="nav nav-tabs profile-tabs mb-4">
-                <li classs="nav-item">
+                <li class="nav-item">
                     <a class="nav-link profile-tab" href="{{ route('profile.edit') }}">Perfil</a>
                 </li>
                 <li class="nav-item">
@@ -131,6 +131,22 @@
                                             @if($document->notes)
                                                 <p class="card-text text-muted small"><i class="fas fa-info-circle me-1"></i>{{ $document->notes }}</p>
                                             @endif
+                                            
+                                            {{-- Botón de descarga para Carta de Aceptación --}}
+                                            @if(stripos($document->name, 'Carta de aceptación') !== false || $document->id == 6)
+                                                <div class="mb-2">
+                                                    <a href="{{ asset('templates/carta-aceptacion-pickntruck.pdf') }}" 
+                                                       class="btn btn-sm btn-outline-primary" 
+                                                       download="Carta_de_Aceptacion_PickNTruck.pdf"
+                                                       target="_blank">
+                                                        <i class="fas fa-download me-1"></i>Descargar Plantilla PDF
+                                                    </a>
+                                                    <small class="d-block text-muted mt-1">
+                                                        <i class="fas fa-info-circle me-1"></i>Imprima en hoja membretada, complete, firme y suba el PDF escaneado
+                                                    </small>
+                                                </div>
+                                            @endif
+                                            
                                             <span class="badge {{ $statusBadge }} mb-2">{{ $statusText }}</span>
                                         </div>
                                         <div class="col-md-7">
@@ -151,30 +167,34 @@
                                                  <!-- Mostrar el documento usando la URL completa -->
                                                 @if($userDoc->file_path)
                                                     <div class="mt-2">
-                                                        <a href="{{ asset($userDoc->file_path) }}" target="_blank" class="btn btn-primary btn-sm fw-bold">
+                                                        <button type="button" class="btn btn-primary btn-sm fw-bold" onclick="previewDocument('{{ asset($userDoc->file_path) }}', '{{ $document->name }}')">
                                                             <i class="fas fa-eye me-1"></i> Ver documento
-                                                        </a>
+                                                        </button>
                                                     </div>
                                                 @endif
                                             @else
-                                                <form action="{{ route('profile.upload-document') }}" method="POST" enctype="multipart/form-data" class="upload-form">
+                                                <form action="{{ route('profile.upload-document') }}" method="POST" enctype="multipart/form-data" class="upload-form" data-doc-id="{{ $document->id }}">
                                                     @csrf
                                                     <input type="hidden" name="document_id" value="{{ $document->id }}">
                                                     <div class="input-group">
-                                                        <input type="file" name="document" class="form-control form-control-sm" accept=".pdf,.jpg,.jpeg,.png" required>
+                                                        <input type="file" name="document" class="form-control form-control-sm document-input" accept=".pdf,.jpg,.jpeg,.png" required data-doc-id="{{ $document->id }}">
+                                                        <button type="button" class="btn btn-outline-secondary btn-sm preview-btn" data-doc-id="{{ $document->id }}" style="display: none;">
+                                                            <i class="fas fa-eye me-1"></i>Vista previa
+                                                        </button>
                                                         <button type="submit" class="btn btn-primary btn-sm fw-bold">
                                                             <i class="fas fa-upload me-1"></i>{{ $userDoc ? 'Reenviar' : 'Enviar' }}
                                                         </button>
                                                     </div>
                                                     <div class="form-text">Formatos aceptados: PDF, JPG, PNG. Máx. 2MB</div>
+                                                    <div class="preview-container mt-2" id="preview-{{ $document->id }}" style="display: none;"></div>
                                                 </form>
                                                 
                                                 <!-- Mostrar el documento usando la URL completa si existe -->
                                                 @if($userDoc && $userDoc->file_path)
                                                     <div class="mt-2">
-                                                        <a href="{{ asset($userDoc->file_path) }}" target="_blank" class="btn btn-primary btn-sm fw-bold">
+                                                        <button type="button" class="btn btn-outline-primary btn-sm" onclick="previewDocument('{{ asset($userDoc->file_path) }}', '{{ $document->name }}')">
                                                             <i class="fas fa-eye me-1"></i> Ver documento enviado
-                                                        </a>
+                                                        </button>
                                                         
                                                         @if(config('app.debug'))
                                                         <div class="mt-2 small text-muted">
@@ -222,34 +242,218 @@
         </div>
     </div>
 </div>
+
+<!-- Modal de previsualización de documentos -->
+<div class="modal fade" id="documentPreviewModal" tabindex="-1" aria-labelledby="documentPreviewModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="documentPreviewModalLabel">Vista previa del documento</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body" id="documentPreviewBody" style="min-height: 500px; max-height: 80vh; overflow-y: auto;">
+                <div class="text-center">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Cargando...</span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <a href="#" id="downloadDocumentBtn" class="btn btn-primary" target="_blank" download>
+                    <i class="fas fa-download me-1"></i>Descargar
+                </a>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 @endsection
 
 @push('scripts')
 <script>
+    // Función global para previsualizar documentos ya subidos
+    function previewDocument(url, title) {
+        const modal = new bootstrap.Modal(document.getElementById('documentPreviewModal'));
+        const modalTitle = document.getElementById('documentPreviewModalLabel');
+        const modalBody = document.getElementById('documentPreviewBody');
+        const downloadBtn = document.getElementById('downloadDocumentBtn');
+        
+        modalTitle.textContent = title || 'Vista previa del documento';
+        downloadBtn.href = url;
+        
+        // Extraer el nombre del archivo de la URL y establecerlo como nombre de descarga
+        const fileName = url.split('/').pop();
+        const extension = fileName.split('.').pop().toLowerCase();
+        const sanitizedTitle = (title || 'documento').replace(/[^a-z0-9]/gi, '_').toLowerCase();
+        downloadBtn.setAttribute('download', sanitizedTitle + '.' + extension);
+        
+        // Mostrar loading
+        modalBody.innerHTML = `
+            <div class="text-center">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Cargando...</span>
+                </div>
+                <p class="mt-3 text-muted">Cargando documento...</p>
+            </div>
+        `;
+        
+        modal.show();
+        
+        // Determinar tipo de archivo
+        
+        if (extension === 'pdf') {
+            modalBody.innerHTML = `<embed src="${url}" type="application/pdf" width="100%" height="600px" />`;
+        } else if (['jpg', 'jpeg', 'png', 'gif'].includes(extension)) {
+            modalBody.innerHTML = `
+                <div class="text-center">
+                    <img src="${url}" class="img-fluid" alt="${title}" style="max-height: 70vh;" />
+                </div>
+            `;
+        } else {
+            modalBody.innerHTML = `
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    No se puede mostrar una vista previa de este tipo de archivo. 
+                    <a href="${url}" target="_blank" class="alert-link">Haga clic aquí para abrirlo en una nueva pestaña</a>.
+                </div>
+            `;
+        }
+    }
+
     document.addEventListener('DOMContentLoaded', function() {
         // Mejorar la experiencia de usuario para los formularios de carga
         const forms = document.querySelectorAll('.upload-form');
         forms.forEach(form => {
-            const fileInput = form.querySelector('input[type="file"]');
+            const fileInput = form.querySelector('.document-input');
             const submitBtn = form.querySelector('button[type="submit"]');
+            const previewBtn = form.querySelector('.preview-btn');
+            const docId = form.dataset.docId;
+            const previewContainer = document.getElementById(`preview-${docId}`);
             
-            // Mostrar nombre del archivo seleccionado sin cambiar el texto del botón
+            // Manejo AJAX del formulario
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const formData = new FormData(this);
+                const originalBtnText = submitBtn.innerHTML;
+                
+                // Deshabilitar botón y mostrar loading
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Enviando...';
+                
+                fetch(this.action, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json'
+                    }
+                })
+                .then(response => {
+                    // Verificar si la respuesta es exitosa
+                    if (!response.ok) {
+                        return response.text().then(text => {
+                            console.error('Error del servidor:', text);
+                            throw new Error(`Error ${response.status}: ${response.statusText}`);
+                        });
+                    }
+                    
+                    // Verificar que sea JSON
+                    const contentType = response.headers.get("content-type");
+                    if (contentType && contentType.includes("application/json")) {
+                        return response.json();
+                    } else {
+                        throw new Error('La respuesta del servidor no es JSON');
+                    }
+                })
+                .then(data => {
+                    if (data.success) {
+                        // Mostrar mensaje de éxito con toast profesional
+                        if (window.showToastNotification) {
+                            window.showToastNotification(
+                                '✓ ¡Documento Enviado!', 
+                                data.message || 'Tu documento ha sido subido correctamente y está en revisión.',
+                                'success',
+                                4000
+                            );
+                        } else {
+                            alert(data.message || 'Documento subido correctamente');
+                        }
+
+                        // Actualizar el estado del documento en la UI sin recargar
+                        const badge = form.closest('.card').querySelector('.badge');
+                        if (badge) {
+                            badge.className = 'badge bg-warning text-dark';
+                            badge.textContent = 'Pendiente';
+                        }
+                        
+                        // Deshabilitar el formulario ya que el documento fue enviado
+                        form.querySelector('input[type="file"]').disabled = true;
+                        submitBtn.disabled = true;
+                        submitBtn.innerHTML = '✓ Enviado';
+                        submitBtn.classList.remove('btn-primary');
+                        submitBtn.classList.add('btn-success');
+                    } else {
+                        throw new Error(data.error || 'Error al subir el documento');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error completo:', error);
+                    const errorMsg = error.message || 'Error al subir el documento. Por favor, intente nuevamente.';
+                    
+                    if (window.showToastNotification) {
+                        window.showToastNotification(
+                            '✕ Error al Subir',
+                            errorMsg,
+                            'error',
+                            6000
+                        );
+                    } else {
+                        alert('Error: ' + errorMsg);
+                    }
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalBtnText;
+                });
+            });
+            
+            // Manejar selección de archivo
             if (fileInput) {
                 fileInput.addEventListener('change', function() {
                     if (this.files.length > 0) {
-                        const fileSize = (this.files[0].size / (1024 * 1024)).toFixed(2);
+                        const file = this.files[0];
+                        const fileSize = (file.size / (1024 * 1024)).toFixed(2);
                         
                         // Verificar tamaño máximo permitido
-                        if (this.files[0].size > 2 * 1024 * 1024) {
+                        if (file.size > 2 * 1024 * 1024) {
                             alert('El archivo es demasiado grande. El tamaño máximo permitido es 2MB.');
                             this.value = '';
+                            previewBtn.style.display = 'none';
+                            previewContainer.style.display = 'none';
                             return;
                         }
                         
-                        // No modificar el texto del botón, solo mantener Enviar o Reenviar
-                        // Podemos mostrar el nombre del archivo en otro lugar si es necesario
+                        // Mostrar botón de vista previa
+                        previewBtn.style.display = 'inline-block';
+                        
+                        // Generar vista previa automática
+                        generatePreview(file, previewContainer);
+                    } else {
+                        previewBtn.style.display = 'none';
+                        previewContainer.style.display = 'none';
                     }
                 });
+                
+                // Manejar clic en botón de vista previa
+                if (previewBtn) {
+                    previewBtn.addEventListener('click', function() {
+                        if (fileInput.files.length > 0) {
+                            const file = fileInput.files[0];
+                            showFilePreviewModal(file);
+                        }
+                    });
+                }
             }
             
             form.addEventListener('submit', function(e) {
@@ -267,7 +471,107 @@
             });
         });
     });
+    
+    // Función para generar vista previa inline
+    function generatePreview(file, container) {
+        container.innerHTML = '';
+        container.style.display = 'none';
+        
+        const reader = new FileReader();
+        
+        reader.onload = function(e) {
+            const fileType = file.type;
+            
+            if (fileType.startsWith('image/')) {
+                container.innerHTML = `
+                    <div class="card">
+                        <div class="card-body p-2">
+                            <div class="row align-items-center">
+                                <div class="col-auto">
+                                    <img src="${e.target.result}" class="img-thumbnail" style="max-height: 80px; max-width: 80px;" />
+                                </div>
+                                <div class="col">
+                                    <small class="text-muted">
+                                        <i class="fas fa-file-image me-1"></i>
+                                        <strong>${file.name}</strong> (${(file.size / 1024).toFixed(2)} KB)
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.style.display = 'block';
+            } else if (fileType === 'application/pdf') {
+                container.innerHTML = `
+                    <div class="card">
+                        <div class="card-body p-2">
+                            <small class="text-muted">
+                                <i class="fas fa-file-pdf me-1 text-danger"></i>
+                                <strong>${file.name}</strong> (${(file.size / 1024).toFixed(2)} KB)
+                            </small>
+                        </div>
+                    </div>
+                `;
+                container.style.display = 'block';
+            }
+        };
+        
+        if (file.type.startsWith('image/')) {
+            reader.readAsDataURL(file);
+        } else {
+            reader.readAsArrayBuffer(file);
+        }
+    }
+    
+    // Función para mostrar vista previa en modal
+    function showFilePreviewModal(file) {
+        const modal = new bootstrap.Modal(document.getElementById('documentPreviewModal'));
+        const modalTitle = document.getElementById('documentPreviewModalLabel');
+        const modalBody = document.getElementById('documentPreviewBody');
+        const downloadBtn = document.getElementById('downloadDocumentBtn');
+        
+        modalTitle.textContent = file.name;
+        downloadBtn.style.display = 'none'; // Ocultar botón de descarga para archivos locales
+        
+        modalBody.innerHTML = `
+            <div class="text-center">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Cargando...</span>
+                </div>
+            </div>
+        `;
+        
+        modal.show();
+        
+        const reader = new FileReader();
+        
+        reader.onload = function(e) {
+            const fileType = file.type;
+            
+            if (fileType.startsWith('image/')) {
+                modalBody.innerHTML = `
+                    <div class="text-center">
+                        <img src="${e.target.result}" class="img-fluid" alt="${file.name}" style="max-height: 70vh;" />
+                    </div>
+                `;
+            } else if (fileType === 'application/pdf') {
+                modalBody.innerHTML = `<embed src="${e.target.result}" type="application/pdf" width="100%" height="600px" />`;
+            } else {
+                modalBody.innerHTML = `
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Archivo seleccionado: <strong>${file.name}</strong> (${(file.size / 1024).toFixed(2)} KB)
+                    </div>
+                `;
+            }
+        };
+        
+        reader.readAsDataURL(file);
+    }
 </script>
+
+<!-- Script para actualización automática cuando el admin aprueba/rechaza documentos -->
+<script src="/js/document-auto-refresh.js"></script>
 @endpush
 
 @push('styles')
@@ -337,6 +641,49 @@
         color: white !important;
         background-color: transparent !important;
         border-bottom: 2px solid white !important;
+    }
+    
+    .preview-container {
+        animation: slideDown 0.3s ease-out;
+    }
+    
+    @keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .preview-btn {
+        transition: all 0.2s ease;
+    }
+    
+    .preview-btn:hover {
+        transform: scale(1.05);
+    }
+    
+    #documentPreviewModal .modal-body {
+        background-color: #f8f9fa;
+    }
+    
+    #documentPreviewModal embed {
+        border: none;
+        border-radius: 0.25rem;
+    }
+    
+    .img-thumbnail {
+        border: 2px solid #dee2e6;
+        transition: all 0.2s ease;
+    }
+    
+    .img-thumbnail:hover {
+        border-color: #0d6efd;
+        transform: scale(1.05);
+        cursor: pointer;
     }
 </style>
 @endpush

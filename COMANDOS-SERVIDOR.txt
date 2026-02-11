@@ -1,0 +1,92 @@
+# COMANDOS PARA EJECUTAR EN EL SERVIDOR
+# Copia y pega estos comandos uno por uno después de conectarte por SSH
+
+# ============================================
+# 1. CONECTAR AL SERVIDOR
+# ============================================
+ssh u556487000@195.35.33.170 -p 65002
+
+
+# ============================================
+# 2. IR AL DIRECTORIO DE LA APLICACIÓN
+# ============================================
+cd domains/app.pickntruck.com/public_html
+
+
+# ============================================
+# 3. HACER BACKUP DEL .ENV Y BASE DE DATOS
+# ============================================
+cp .env .env.backup.20260210
+
+# OPCIONAL: Backup de la base de datos (recomendado)
+php artisan db:backup
+# O manualmente con mysqldump:
+# mysqldump -u tu_usuario -p pickn6web > backup_20260210.sql
+
+
+# ============================================
+# 4. INSTALAR DEPENDENCIAS DE COMPOSER
+# ============================================
+composer install --no-dev --optimize-autoloader
+
+
+# ============================================
+# 5. PERMISOS CORRECTOS
+# ============================================
+chmod -R 775 storage
+chmod -R 775 bootstrap/cache
+
+
+# ============================================
+# 6. LIMPIAR CACHÉS
+# ============================================
+php artisan route:clear
+php artisan config:clear
+php artisan cache:clear
+php artisan view:clear
+
+
+# ============================================
+# 7. OPTIMIZAR PARA PRODUCCIÓN
+# ============================================
+php artisan config:cache
+php artisan route:cache
+php artisan view:cache
+
+
+# ============================================
+# 8. EJECUTAR MIGRACIONES (si hay nuevas)
+# ============================================
+# Primero verificar si hay migraciones pendientes:
+php artisan migrate:status
+
+# Si hay pendientes, ejecutar:
+php artisan migrate --force
+
+
+# ============================================
+# 9. INSTALAR DEPENDENCIAS NPM Y COMPILAR
+# ============================================
+npm install --production
+npm run build
+
+
+# ============================================
+# 10. ENLACE SIMBÓLICO DE STORAGE
+# ============================================
+php artisan storage:link
+
+
+# ============================================
+# 11. VERIFICAR QUE TODO FUNCIONA
+# ============================================
+# Abrir en navegador:
+# https://app.pickntruck.com
+
+# Verificar logs en caso de error:
+tail -50 storage/logs/laravel.log
+
+
+# ============================================
+# FIN - DESPLIEGUE COMPLETO
+# ============================================

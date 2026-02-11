@@ -84,7 +84,51 @@
         }
     }
     
-    // Actualizar cada segundo (igual que el dashboard)
+    // Configurar listener de Echo para actualizaciones en tiempo real
+    function setupEchoListener() {
+        // Obtener el userId del atributo data o del usuario autenticado
+        const userId = document.body.getAttribute('data-user-id') || 
+                       document.querySelector('[data-user-id]')?.dataset.userId;
+        
+        if (!userId) {
+            console.log('No se encontró userId, usando solo polling');
+            return;
+        }
+        
+        // Verificar que Echo esté disponible
+        if (typeof window.Echo === 'undefined') {
+            console.log('Echo no disponible, reintentando en 1 segundo...');
+            setTimeout(setupEchoListener, 1000);
+            return;
+        }
+        
+        try {
+            // Escuchar el evento NewBidCreated en el canal privado del usuario
+            window.Echo.private(`App.Models.User.${userId}`)
+                .listen('.NewBidCreated', (data) => {
+                    console.log('Nueva oferta recibida en tiempo real:', data);
+                    // Actualizar la tabla inmediatamente
+                    actualizarTabla();
+                    
+                    // Mostrar notificación visual si es posible
+                    if (typeof window.showToast === 'function') {
+                        window.showToast(
+                            `Nueva oferta de $${data.monto} recibida de ${data.user.name}`,
+                            'success'
+                        );
+                    }
+                });
+            
+            console.log('Listener Echo configurado para nuevas ofertas');
+        } catch (error) {
+            console.error('Error al configurar listener Echo:', error);
+        }
+    }
+    
+    // Intentar configurar Echo listener
+    setupEchoListener();
+    
+    // Actualizar cada segundo como fallback (mantener polling para estabilidad)
     setInterval(actualizarTabla, 1000);
     
     console.log('Actualización automática de tabla de ofertas activada');

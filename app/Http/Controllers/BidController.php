@@ -152,9 +152,14 @@ class BidController extends Controller
                 'estado'        => 'pendiente',
             ]);
 
-            // Notificaciones (tu bloque tal cual; lo dejo igual)
+            // Notificaciones y Broadcast
             try {
                 $bid->refresh()->load(['bideable','user']);
+                
+                // Disparar evento de broadcast en tiempo real
+                event(new \App\Events\NewBidCreated($bid));
+                
+                // Notificación de base de datos (respaldo)
                 $model->user->notify(new BidReceived($bid));
             } catch (\Exception $e) {
                 Log::error("Error al enviar notificación BidReceived: ".$e->getMessage());
