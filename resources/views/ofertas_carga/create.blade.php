@@ -54,17 +54,17 @@
                             
                             <div class="row g-2">
                                 <div class="col-md-4">
-                                    <select id="origen_pais" class="form-control">
+                                    <select id="origen_pais" class="form-control" autocomplete="off">
                                         <option value="">País</option>
                                     </select>
                                 </div>
                                 <div class="col-md-4">
-                                    <select id="origen_departamento" class="form-control" disabled>
+                                    <select id="origen_departamento" class="form-control" disabled autocomplete="off">
                                         <option value="">Departamento/Región</option>
                                     </select>
                                 </div>
                                 <div class="col-md-4">
-                                    <select id="origen_ciudad" class="form-control" disabled>
+                                    <select id="origen_ciudad" class="form-control" disabled autocomplete="off">
                                         <option value="">Ciudad</option>
                                     </select>
                                 </div>
@@ -81,17 +81,17 @@
                             
                             <div class="row g-2">
                                 <div class="col-md-4">
-                                    <select id="destino_pais" class="form-control">
+                                    <select id="destino_pais" class="form-control" autocomplete="off">
                                         <option value="">País</option>
                                     </select>
                                 </div>
                                 <div class="col-md-4">
-                                    <select id="destino_departamento" class="form-control" disabled>
+                                    <select id="destino_departamento" class="form-control" disabled autocomplete="off">
                                         <option value="">Departamento/Región</option>
                                     </select>
                                 </div>
                                 <div class="col-md-4">
-                                    <select id="destino_ciudad" class="form-control" disabled>
+                                    <select id="destino_ciudad" class="form-control" disabled autocomplete="off">
                                         <option value="">Ciudad</option>
                                     </select>
                                 </div>
