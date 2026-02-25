@@ -150,6 +150,29 @@ class User extends Authenticatable
         return $this->hasOne(Empresa::class);
     }
 
+    /**
+     * Get the memberships for the user.
+     */
+    public function memberships(): HasMany
+    {
+        return $this->hasMany(Membership::class);
+    }
+
+    /**
+     * Get the active membership for the user.
+     */
+    public function activeMembership()
+    {
+        return $this->hasOne(Membership::class)->where('status', 'active')->latest();
+    }
+
+    /**
+     * Get the demo requests for the user.
+     */
+    public function demoRequests(): HasMany
+    {
+        return $this->hasMany(DemoRequest::class);
+    }
 
     /**
      * La ruta para las notificaciones push.

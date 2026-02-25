@@ -14,6 +14,8 @@ use App\Http\Controllers\Api\DocumentController;
 use App\Http\Controllers\Api\Auth\ProfileController;
 use App\Http\Controllers\Api\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Api\Auth\NewPasswordController;
+use App\Http\Controllers\Api\LandingController;
+use App\Http\Controllers\Api\MembershipController;
 
 /*
 |--------------------------------------------------------------------------
@@ -43,6 +45,10 @@ Route::middleware('api')->group(function () {
     Route::post('/login', [AuthenticatedSessionController::class, 'store']);
     Route::post('/register', [RegisterController::class, 'store']);
     Route::post('/auth/logout', [AuthenticatedSessionController::class, 'destroy'])->name('api.logout');
+
+    // Rutas públicas - Landing page
+    Route::post('/landing/demo', [LandingController::class, 'storeDemoRequest']);
+    Route::post('/landing/register', [MembershipController::class, 'store']);
 
     // Rutas públicas - Ofertas
     Route::apiResource('ofertas', OfertaRutaController::class)->only(['index', 'show']);
