@@ -5,10 +5,11 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\DemoRequest;
-use App\Jobs\SendDemoEmails;
+use App\Mail\DemoRequestReceived;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Log;
 
 class LandingController extends Controller
@@ -35,12 +36,6 @@ class LandingController extends Controller
             $existingUser = User::where('email', $validated['email'])->first();
             
             if ($existingUser) {
-                // Actualizar teléfono y empresa con los datos más recientes del formulario
-                $existingUser->update([
-                    'phone' => $validated['phone'],
-                    'company_name' => $validated['companyName'],
-                ]);
-
                 // Create demo request for existing user
                 $demoRequest = DemoRequest::create([
                     'user_id' => $existingUser->id,
@@ -49,16 +44,27 @@ class LandingController extends Controller
                     'requested_at' => now(),
                 ]);
 
-                // Dispatch email job to queue
-                SendDemoEmails::dispatch($existingUser, $demoRequest, $role);
-
-                return response()->json([
+                // Respond immediately
+                $response = response()->json([
                     'success' => true,
                     'message' => 'Demo request submitted successfully',
                     'user_id' => $existingUser->id,
-                ], 200)->header('Access-Control-Allow-Origin', 'https://pickntruck.com')
-                    ->header('Access-Control-Allow-Methods', 'POST, OPTIONS')
-                    ->header('Access-Control-Allow-Headers', 'Content-Type');
+                ], 200);
+
+                // Send emails after response (non-blocking)
+                register_shutdown_function(function() use ($existingUser, $demoRequest) {
+                    try {
+                        Mail::to($existingUser->email)->send(new DemoRequestReceived($existingUser, $demoRequest));
+                        Log::info('Demo request email sent successfully to: ' . $existingUser->email);
+                    } catch (\Exception $e) {
+                        Log::error('Failed to send demo request email', [
+                            'email' => $existingUser->email,
+                            'error' => $e->getMessage(),
+                        ]);
+                    }
+                });
+
+                return $response;
             }
 
             // Create new user
@@ -81,16 +87,47 @@ class LandingController extends Controller
                 'requested_at' => now(),
             ]);
 
-            // Dispatch email job to queue
-            SendDemoEmails::dispatch($user, $demoRequest, $role);
-
-            return response()->json([
+            // Respond immediately
+            $response = response()->json([
                 'success' => true,
                 'message' => 'Demo request submitted successfully',
                 'user_id' => $user->id,
-            ], 201)->header('Access-Control-Allow-Origin', 'https://pickntruck.com')
-                ->header('Access-Control-Allow-Methods', 'POST, OPTIONS')
-                ->header('Access-Control-Allow-Headers', 'Content-Type');
+            ], 201);
+
+            // Send emails after response (non-blocking)
+            register_shutdown_function(function() use ($user, $demoRequest, $role, $validated) {
+                // Send email notification to user
+                try {
+                    Mail::to($user->email)->send(new DemoRequestReceived($user, $demoRequest));
+                    Log::info('Demo request email sent to user: ' . $user->email);
+                } catch (\Exception $e) {
+                    Log::error('Failed to send demo request email to user', [
+                        'email' => $user->email,
+                        'error' => $e->getMessage(),
+                    ]);
+                }
+
+                // Send notification to support
+                try {
+                    Mail::to(config('mail.from.address', 'soporte@pickntruck.com'))->send(
+                        new \App\Mail\SupportNotification('Nueva Solicitud de Demo', [
+                            'Nombre' => $user->name,
+                            'Empresa' => $user->company_name,
+                            'Email' => $user->email,
+                            'Teléfono' => $user->phone,
+                            'Tipo' => $role === User::ROLE_FORWARDER ? 'Forwarder' : 'Carrier',
+                            'Información Adicional' => $validated['additionalInfo'] ?? 'N/A',
+                        ])
+                    );
+                    Log::info('Demo request notification sent to support');
+                } catch (\Exception $e) {
+                    Log::error('Failed to send demo request notification to support', [
+                        'error' => $e->getMessage(),
+                    ]);
+                }
+            });
+
+            return $response;
 
         } catch (\Illuminate\Validation\ValidationException $e) {
             return response()->json([

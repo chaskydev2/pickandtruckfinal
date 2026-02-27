@@ -33,7 +33,7 @@
             <p><span class="info-label">Email:</span> {{ $user->email }}</p>
             <p><span class="info-label">Teléfono:</span> {{ $user->phone }}</p>
             <p><span class="info-label">Tipo:</span> {{ $user->role === 'forwarder' ? 'Agente de Carga' : 'Empresa de Transporte' }}</p>
-            <p><span class="info-label">Fecha:</span> {{ $demoRequest->requested_at->format('d/m/Y H:i') }}</p>
+            <p><span class="info-label">Fecha:</span> {{ $demoRequest->requested_at ? $demoRequest->requested_at->format('d/m/Y H:i') : now()->format('d/m/Y H:i') }}</p>
         </div>
 
         <div class="highlight-box">

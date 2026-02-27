@@ -5,11 +5,10 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\Membership;
-use App\Mail\MembershipCreated;
+use App\Jobs\SendMembershipEmails;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rules\Password;
@@ -77,33 +76,29 @@ class MembershipController extends Controller
                 'payment_proof_path' => $paymentProofPath,
             ]);
 
-            // Try to send emails (don't fail if email sending fails)
-            try {
-                Mail::to($user->email)->send(new MembershipCreated($user, $membership));
-                
-                Mail::to(config('mail.from.address', 'soporte@pickntruck.com'))->send(
-                    new \App\Mail\SupportNotification('Nuevo Registro de Membresía', [
-                        'Nombre' => $user->name,
-                        'Email' => $user->email,
-                        'Empresa' => $user->company_name,
-                        'Tier' => ucfirst($validated['membershipTier']),
-                        'Ciclo' => $validated['billingCycle'] === 'monthly' ? 'Mensual' : 'Anual',
-                        'Monto' => '$' . number_format($price, 2),
-                        'Método de Pago' => $paymentMethod === 'qr' ? 'QR' : 'Crypto',
-                        'Comprobante' => $paymentProofPath ? 'Subido' : 'No subido',
-                    ])
-                );
-            } catch (\Exception $mailError) {
-                Log::warning('Failed to send membership emails: ' . $mailError->getMessage());
-                // Continue anyway - user and membership were created successfully
-            }
+            // Prepare notification data
+            $notificationData = [
+                'Nombre' => $user->name,
+                'Email' => $user->email,
+                'Empresa' => $user->company_name,
+                'Tier' => ucfirst($validated['membershipTier']),
+                'Ciclo' => $validated['billingCycle'] === 'monthly' ? 'Mensual' : 'Anual',
+                'Monto' => '$' . number_format($price, 2),
+                'Método de Pago' => $paymentMethod === 'qr' ? 'QR' : 'Crypto',
+                'Comprobante' => $paymentProofPath ? 'Subido' : 'No subido',
+            ];
+
+            // Dispatch email job to queue
+            SendMembershipEmails::dispatch($user, $membership, $notificationData);
 
             return response()->json([
                 'success' => true,
                 'message' => 'Registration successful',
                 'user_id' => $user->id,
                 'membership_id' => $membership->id,
-            ], 201);
+            ], 201)->header('Access-Control-Allow-Origin', 'https://pickntruck.com')
+                ->header('Access-Control-Allow-Methods', 'POST, OPTIONS')
+                ->header('Access-Control-Allow-Headers', 'Content-Type');
 
         } catch (\Illuminate\Validation\ValidationException $e) {
             return response()->json([

@@ -1,0 +1,56 @@
+CONFIGURACIÓN DE CRON JOB PARA PROCESAMIENTO AUTOMÁTICO DE EMAILS
+=====================================================================
+
+El sistema de Queue está instalado. Ahora necesitas configurar un cron job
+en Hostinger para que procese los emails automáticamente.
+
+PASOS PARA CONFIGURAR EN HOSTINGER:
+-----------------------------------
+
+1. Ingresa a tu panel de Hostinger (hpanel.hostinger.com)
+
+2. Ve a "Advanced" → "Cron Jobs"
+
+3. Agrega un nuevo Cron Job con estos datos:
+
+   Tipo: Common Settings → "Once Per Minute (Every Minute)"
+   
+   O manualmente:
+   - Minute: * (cada minuto)
+   - Hour: * (cada hora)
+   - Day: * (cada día)
+   - Month: * (cada mes)
+   - Weekday: * (cada día de la semana)
+
+4. En el campo "Command to execute", pega EXACTAMENTE esto:
+
+/usr/bin/php8.2 /home/u556487000/domains/app.pickntruck.com/public_html/artisan queue:work --stop-when-empty --max-time=55
+
+5. Guarda el cron job
+
+ALTERNATIVA (si el anterior no funciona):
+----------------------------------------
+
+Command to execute:
+cd /home/u556487000/domains/app.pickntruck.com/public_html && /usr/bin/php8.2 artisan queue:work --once
+
+=====================================================================
+
+¿QUÉ HACE ESTO?
+- Cada minuto, el servidor revisa si hay emails pendientes en la cola
+- Si hay emails, los envía automáticamente
+- Si no hay nada, se detiene y espera al siguiente minuto
+
+VERIFICAR QUE FUNCIONA:
+-----------------------
+1. Envía un formulario desde pickntruck.com
+2. Espera 1 minuto
+3. El email debería llegar automáticamente
+
+PROBAR MANUALMENTE (si quieres enviar emails YA):
+--------------------------------------------------
+ssh -p 65002 u556487000@195.35.33.170
+cd domains/app.pickntruck.com/public_html
+php artisan queue:work --once
+
+=====================================================================
