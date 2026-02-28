@@ -3,18 +3,17 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\User;
 use App\Models\DemoRequest;
 use App\Jobs\SendDemoEmails;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 
 class LandingController extends Controller
 {
     /**
      * Handle demo request from landing page.
+     * Does NOT create a user account - only stores contact info in demo_requests.
      */
     public function storeDemoRequest(Request $request): JsonResponse
     {
@@ -28,66 +27,24 @@ class LandingController extends Controller
                 'additionalInfo' => ['nullable', 'string', 'max:1000'],
             ]);
 
-            // Map company type to role
-            $role = $validated['companyType'] === 'forwarder' ? User::ROLE_FORWARDER : User::ROLE_CARRIER;
-
-            // Check if user already exists
-            $existingUser = User::where('email', $validated['email'])->first();
-            
-            if ($existingUser) {
-                // Actualizar teléfono y empresa con los datos más recientes del formulario
-                $existingUser->update([
-                    'phone' => $validated['phone'],
-                    'company_name' => $validated['companyName'],
-                ]);
-
-                // Create demo request for existing user
-                $demoRequest = DemoRequest::create([
-                    'user_id' => $existingUser->id,
-                    'additional_info' => $validated['additionalInfo'] ?? null,
-                    'status' => DemoRequest::STATUS_PENDING,
-                    'requested_at' => now(),
-                ]);
-
-                // Dispatch email job to queue
-                SendDemoEmails::dispatch($existingUser, $demoRequest, $role);
-
-                return response()->json([
-                    'success' => true,
-                    'message' => 'Demo request submitted successfully',
-                    'user_id' => $existingUser->id,
-                ], 200)->header('Access-Control-Allow-Origin', 'https://pickntruck.com')
-                    ->header('Access-Control-Allow-Methods', 'POST, OPTIONS')
-                    ->header('Access-Control-Allow-Headers', 'Content-Type');
-            }
-
-            // Create new user
-            $user = User::create([
-                'name' => $validated['name'],
-                'email' => $validated['email'],
-                'phone' => $validated['phone'],
-                'password' => Hash::make(bin2hex(random_bytes(16))), // Random password
-                'role' => $role,
-                'company_name' => $validated['companyName'],
-                'verified' => false,
-                'estado' => 'Activo',
-            ]);
-
-            // Create demo request
+            // Save contact info directly in demo_requests (no user account created)
             $demoRequest = DemoRequest::create([
-                'user_id' => $user->id,
+                'name'         => $validated['name'],
+                'email'        => $validated['email'],
+                'phone'        => $validated['phone'],
+                'company_name' => $validated['companyName'],
+                'company_type' => $validated['companyType'],
                 'additional_info' => $validated['additionalInfo'] ?? null,
-                'status' => DemoRequest::STATUS_PENDING,
+                'status'       => DemoRequest::STATUS_PENDING,
                 'requested_at' => now(),
             ]);
 
             // Dispatch email job to queue
-            SendDemoEmails::dispatch($user, $demoRequest, $role);
+            SendDemoEmails::dispatch($demoRequest);
 
             return response()->json([
                 'success' => true,
                 'message' => 'Demo request submitted successfully',
-                'user_id' => $user->id,
             ], 201)->header('Access-Control-Allow-Origin', 'https://pickntruck.com')
                 ->header('Access-Control-Allow-Methods', 'POST, OPTIONS')
                 ->header('Access-Control-Allow-Headers', 'Content-Type');
@@ -100,7 +57,7 @@ class LandingController extends Controller
             ], 422);
         } catch (\Exception $e) {
             Log::error('Demo request error: ' . $e->getMessage());
-            
+
             return response()->json([
                 'success' => false,
                 'message' => 'An error occurred while processing your request',

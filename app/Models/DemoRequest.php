@@ -12,6 +12,11 @@ class DemoRequest extends Model
 
     protected $fillable = [
         'user_id',
+        'name',
+        'email',
+        'phone',
+        'company_name',
+        'company_type',
         'additional_info',
         'status',
         'requested_at',

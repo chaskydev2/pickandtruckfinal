@@ -2,7 +2,6 @@
 
 namespace App\Mail;
 
-use App\Models\User;
 use App\Models\DemoRequest;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
@@ -14,12 +13,10 @@ class DemoRequestReceived extends Mailable
 {
     use Queueable, SerializesModels;
 
-    public $user;
     public $demoRequest;
 
-    public function __construct(User $user, DemoRequest $demoRequest)
+    public function __construct(DemoRequest $demoRequest)
     {
-        $this->user = $user;
         $this->demoRequest = $demoRequest;
     }
 
@@ -36,7 +33,6 @@ class DemoRequestReceived extends Mailable
         return new Content(
             view: 'emails.demo-request-received',
             with: [
-                'user' => $this->user,
                 'demoRequest' => $this->demoRequest,
             ],
         );

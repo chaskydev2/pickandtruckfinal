@@ -15,6 +15,7 @@ class Membership extends Model
         'tier',
         'billing_cycle',
         'price_paid',
+        'price_currency',
         'status',
         'start_date',
         'end_date',

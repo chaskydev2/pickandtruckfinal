@@ -2,7 +2,6 @@
 
 namespace App\Jobs;
 
-use App\Models\User;
 use App\Models\DemoRequest;
 use App\Mail\DemoRequestReceived;
 use App\Mail\SupportNotification;
@@ -24,9 +23,7 @@ class SendDemoEmails implements ShouldQueue
      * Create a new job instance.
      */
     public function __construct(
-        public User $user,
-        public DemoRequest $demoRequest,
-        public string $role
+        public DemoRequest $demoRequest
     ) {}
 
     /**
@@ -55,12 +52,12 @@ class SendDemoEmails implements ShouldQueue
         );
 
         try {
-            // Email al usuario via SMTP explícito
-            $laravelMailer->to($this->user->email)->send(new DemoRequestReceived($this->user, $this->demoRequest));
-            Log::info('Demo request email sent to user: ' . $this->user->email);
+            // Email al solicitante via SMTP explícito
+            $laravelMailer->to($this->demoRequest->email)->send(new DemoRequestReceived($this->demoRequest));
+            Log::info('Demo request email sent to: ' . $this->demoRequest->email);
         } catch (\Exception $e) {
-            Log::error('Failed to send demo request email to user', [
-                'email' => $this->user->email,
+            Log::error('Failed to send demo request email to requester', [
+                'email' => $this->demoRequest->email,
                 'error' => $e->getMessage(),
             ]);
         }
@@ -69,11 +66,11 @@ class SendDemoEmails implements ShouldQueue
             // Email a soporte via SMTP explícito
             $laravelMailer->to(config('mail.from.address', 'soporte@pickntruck.com'))
                 ->send(new SupportNotification('Nueva Solicitud de Demo', [
-                    'Nombre' => $this->user->name,
-                    'Empresa' => $this->user->company_name,
-                    'Email' => $this->user->email,
-                    'Teléfono' => $this->user->phone ?? 'N/A',
-                    'Tipo' => $this->role === 'forwarder' ? 'Forwarder' : 'Carrier',
+                    'Nombre'              => $this->demoRequest->name,
+                    'Empresa'             => $this->demoRequest->company_name,
+                    'Email'               => $this->demoRequest->email,
+                    'Teléfono'            => $this->demoRequest->phone ?? 'N/A',
+                    'Tipo'                => $this->demoRequest->company_type === 'forwarder' ? 'Forwarder' : 'Carrier',
                     'Información Adicional' => $this->demoRequest->additional_info ?? 'N/A',
                 ]));
             Log::info('Demo request notification sent to support');

@@ -22,17 +22,17 @@
     </div>
     
     <div class="content">
-        <p>Hola <strong>{{ $user->name }}</strong>,</p>
+        <p>Hola <strong>{{ $demoRequest->name }}</strong>,</p>
         
         <p>¡Gracias por tu interés en <strong>Pick & Truck</strong>! Hemos recibido tu solicitud para una demostración de nuestra plataforma.</p>
         
         <div class="info-box">
             <h3 style="margin-top: 0; color: #10b981;">Información de tu Solicitud</h3>
-            <p><span class="info-label">Nombre:</span> {{ $user->name }}</p>
-            <p><span class="info-label">Empresa:</span> {{ $user->company_name }}</p>
-            <p><span class="info-label">Email:</span> {{ $user->email }}</p>
-            <p><span class="info-label">Teléfono:</span> {{ $user->phone }}</p>
-            <p><span class="info-label">Tipo:</span> {{ $user->role === 'forwarder' ? 'Agente de Carga' : 'Empresa de Transporte' }}</p>
+            <p><span class="info-label">Nombre:</span> {{ $demoRequest->name }}</p>
+            <p><span class="info-label">Empresa:</span> {{ $demoRequest->company_name }}</p>
+            <p><span class="info-label">Email:</span> {{ $demoRequest->email }}</p>
+            <p><span class="info-label">Teléfono:</span> {{ $demoRequest->phone }}</p>
+            <p><span class="info-label">Tipo:</span> {{ $demoRequest->company_type === 'forwarder' ? 'Agente de Carga' : 'Empresa de Transporte' }}</p>
             <p><span class="info-label">Fecha:</span> {{ $demoRequest->requested_at ? $demoRequest->requested_at->format('d/m/Y H:i') : now()->format('d/m/Y H:i') }}</p>
         </div>
 

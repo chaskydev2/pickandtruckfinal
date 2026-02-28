@@ -65,14 +65,18 @@ class MembershipController extends Controller
                 $paymentProofPath = $request->file('paymentProof')->store('membership_proofs', 'public');
             }
 
+            // Determine currency (Pioneros annual = BOB, everything else = USD)
+            $currency = ($validated['membershipTier'] === 'pioneros' && $validated['billingCycle'] === 'annually') ? 'BOB' : 'USD';
+
             // Create membership
             $membership = Membership::create([
-                'user_id' => $user->id,
-                'tier' => $validated['membershipTier'],
-                'billing_cycle' => $validated['billingCycle'],
-                'price_paid' => $price,
-                'status' => Membership::STATUS_PENDING,
-                'payment_method' => $paymentMethod,
+                'user_id'            => $user->id,
+                'tier'               => $validated['membershipTier'],
+                'billing_cycle'      => $validated['billingCycle'],
+                'price_paid'         => $price,
+                'price_currency'     => $currency,
+                'status'             => Membership::STATUS_PENDING,
+                'payment_method'     => $paymentMethod,
                 'payment_proof_path' => $paymentProofPath,
             ]);
 
@@ -83,7 +87,9 @@ class MembershipController extends Controller
                 'Empresa' => $user->company_name,
                 'Tier' => ucfirst($validated['membershipTier']),
                 'Ciclo' => $validated['billingCycle'] === 'monthly' ? 'Mensual' : 'Anual',
-                'Monto' => '$' . number_format($price, 2),
+                'Monto' => $currency === 'BOB'
+                    ? number_format($price, 0) . ' BOB'
+                    : '$' . number_format($price, 2) . ' USD',
                 'Método de Pago' => $paymentMethod === 'qr' ? 'QR' : 'Crypto',
                 'Comprobante' => $paymentProofPath ? 'Subido' : 'No subido',
             ];
@@ -123,8 +129,8 @@ class MembershipController extends Controller
     private function calculatePrice(string $tier, string $billingCycle): ?float
     {
         $prices = [
-            'pioneros' => ['monthly' => 80, 'annually' => null], // 3333 BOB (handled separately)
-            'visionarios' => ['monthly' => 80, 'annually' => 808],
+            'pioneros'      => ['monthly' => 80, 'annually' => 3333], // 3333 BOB
+            'visionarios'   => ['monthly' => 80, 'annually' => 808],
             'conservadores' => ['monthly' => 99, 'annually' => 999],
         ];
 
