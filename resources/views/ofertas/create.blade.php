@@ -15,7 +15,7 @@
                     <form action="{{ route('ofertas.store') }}" method="POST">
                         @csrf
                         <div class="form-group mb-4">
-                            <label for="tipo_camion">Tipo de Camión <i class="fas fa-question-circle text-muted fst-italic" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-html="true" title="<em>Seleccione el tipo de camión que ofrece para el transporte</em>"></i></label>
+                            <label for="tipo_camion">Tipo de Camión <i class="fas fa-question-circle text-muted" data-bs-toggle="tooltip" data-bs-placement="right" title="Seleccione el tipo de camión que ofrece para el transporte"></i></label>
                             <select id="tipo_camion" name="tipo_camion" class="form-control" required>
                                 <option value="">Seleccione un tipo de camión</option>
                                 @foreach($truckTypes as $truckType)
@@ -25,7 +25,7 @@
                         </div>
                         <!-- Selector de Origen -->
                         <div class="form-group mb-3">
-                            <label>Origen <i class="fas fa-question-circle text-muted fst-italic" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-html="true" title="<em>Seleccione el país, departamento/región y ciudad de origen</em>"></i></label>
+                            <label>Origen <i class="fas fa-question-circle text-muted" data-bs-toggle="tooltip" data-bs-placement="right" title="Seleccione el país, departamento/región y ciudad de origen"></i></label>
                             <input type="hidden" id="origen" name="origen" required>
                             
                             <div class="row g-2">
@@ -49,7 +49,7 @@
 
                         <!-- Selector de Destino -->
                         <div class="form-group mb-3">
-                            <label>Destino <i class="fas fa-question-circle text-muted fst-italic" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-html="true" title="<em>Seleccione el país, departamento/región y ciudad de destino</em>"></i></label>
+                            <label>Destino <i class="fas fa-question-circle text-muted" data-bs-toggle="tooltip" data-bs-placement="right" title="Seleccione el país, departamento/región y ciudad de destino"></i></label>
                             <input type="hidden" id="destino" name="destino" required>
                             
                             <div class="row g-2">
@@ -71,12 +71,12 @@
                             </div>
                         </div>
                         <div class="form-group mb-3">
-                            <label for="fecha_inicio">Fecha de Inicio <i class="fas fa-question-circle text-muted fst-italic" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-html="true" title="<em>Fecha en la que estará disponible para iniciar el transporte</em>"></i></label>
+                            <label for="fecha_inicio">Fecha de Inicio <i class="fas fa-question-circle text-muted" data-bs-toggle="tooltip" data-bs-placement="right" title="Fecha en la que estará disponible para iniciar el transporte"></i></label>
                             <input type="datetime-local" id="fecha_inicio" name="fecha_inicio" class="form-control" min="{{ now()->format('Y-m-d\TH:i') }}" required>
                             <div class="invalid-feedback" id="fecha-error">La fecha debe ser posterior a la fecha actual</div>
                         </div>
                         <div class="form-group mb-3">
-                            <label for="capacidad">Capacidad <i class="fas fa-question-circle text-muted fst-italic" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-html="true" title="<em>Capacidad máxima de carga en kilogramos</em>"></i></label>
+                            <label for="capacidad">Capacidad <i class="fas fa-question-circle text-muted" data-bs-toggle="tooltip" data-bs-placement="right" title="Capacidad máxima de carga en kilogramos"></i></label>
                             <input type="number" id="capacidad" name="capacidad" class="form-control" min="0" step="1" required>
                             <small class="form-text text-muted">Capacidad en kg</small>
                         </div>
@@ -84,8 +84,7 @@
                         <!-- ① NUEVO: Unidades -->
                         <div class="form-group mb-3">
                             <label for="unidades">Unidades
-                                <i class="fas fa-question-circle text-muted fst-italic" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-html="true"
-                                title="<em>Cantidad de bultos/unidades disponibles en esta ruta</em>"></i>
+                                <i class="fas fa-question-circle text-muted" data-bs-toggle="tooltip" data-bs-placement="right" title="Cantidad de bultos/unidades disponibles en esta ruta"></i>
                             </label>
                             <input type="number" min="1" id="unidades" name="unidades"
                                 class="form-control @error('unidades') is-invalid @enderror"
@@ -102,7 +101,7 @@
                         </div>
 
                         <div class="form-group mb-3">
-                            <label for="precio_referencial">Precio Referencial <i class="fas fa-question-circle text-muted fst-italic" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-html="true" title="<em>Precio estimado por el servicio de transporte en dólares</em>"></i></label>
+                            <label for="precio_referencial">Precio Referencial <i class="fas fa-question-circle text-muted" data-bs-toggle="tooltip" data-bs-placement="right" title="Precio estimado por el servicio de transporte en dólares"></i></label>
                             <input type="number" id="precio_referencial" step="0.01" name="precio_referencial" class="form-control" required>
                             <small class="form-text text-muted">Precio en dólares</small>
                         </div>

@@ -123,8 +123,8 @@
                             <label for="unidades" class="form-label">
                                 Unidades <i class="fas fa-question-circle text-muted" data-bs-toggle="tooltip" data-bs-placement="right" title="Cantidad de bultos/unidades de la carga"></i>
                             </label>
-                            <input type="number" min="1" class="form-control @error('unidades') is-invalid @enderror"
-                                id="unidades" name="unidades" value="{{ old('unidades', 1) }}"
+                            <input type="number" min="1" class="form-control bg-light @error('unidades') is-invalid @enderror"
+                                id="unidades" name="unidades" value="1" readonly
                                 style="appearance: textfield; -moz-appearance: textfield; -webkit-appearance: textfield;">
                             @error('unidades')
                                 <div class="invalid-feedback">{{ $message }}</div>

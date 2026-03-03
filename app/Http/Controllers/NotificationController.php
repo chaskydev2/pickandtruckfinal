@@ -48,11 +48,12 @@ class NotificationController extends Controller
                 ->get()
                 ->map(function ($notification) {
                     return [
-                        'id'      => $notification->id,
-                        'type'    => $notification->type,
-                        'data'    => $notification->data,
-                        'read_at' => $notification->read_at,
-                        'timeAgo' => $notification->created_at->diffForHumans(),
+                        'id'         => $notification->id,
+                        'type'       => $notification->type,
+                        'data'       => $notification->data,
+                        'read_at'    => $notification->read_at,
+                        'created_at' => $notification->created_at->toIso8601String(),
+                        'timeAgo'    => $notification->created_at->diffForHumans(),
                     ];
                 });
 

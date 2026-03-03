@@ -66,11 +66,11 @@
         <!-- Company Information -->
         <div id="companyInformation">
             <div class="mt-4 p-4 border border-gray-300 rounded-lg bg-gray-50">
-                <h3 class="text-lg font-semibold mb-3 text-gray-800">Company Information</h3>
+                <h3 class="text-lg font-semibold mb-3 text-gray-800">Información de la Empresa</h3>
                 
                 <!-- Company Name -->
                 <div class="mb-3">
-                    <x-input-label for="company_name" :value="__('Company Name')" />
+                    <x-input-label for="company_name" :value="__('Nombre de la Empresa')" />
                     <x-text-input id="company_name" class="block mt-1 w-full" type="text" name="company_name" 
                         :value="old('company_name')" required autocomplete="organization" />
                     <x-input-error :messages="$errors->get('company_name')" class="mt-2" />
@@ -81,7 +81,7 @@
 
                 <!-- Country -->
                 <div class="mb-3">
-                    <x-input-label for="country" :value="__('Country')" />
+                    <x-input-label for="country" :value="__('País')" />
                     <x-text-input id="country" class="block mt-1 w-full" type="text" name="country" 
                         :value="old('country')" required autocomplete="country-name" />
                     <x-input-error :messages="$errors->get('country')" class="mt-2" />
@@ -92,7 +92,7 @@
 
                 <!-- City -->
                 <div class="mb-3">
-                    <x-input-label for="city" :value="__('City')" />
+                    <x-input-label for="city" :value="__('Ciudad')" />
                     <x-text-input id="city" class="block mt-1 w-full" type="text" name="city" 
                         :value="old('city')" required autocomplete="address-level2" />
                     <x-input-error :messages="$errors->get('city')" class="mt-2" />
@@ -177,14 +177,16 @@
 
             <!-- Contenido scrolleable -->
             <div id="terms-content" style="flex:1;overflow-y:auto;padding:1.5rem;color:#d1d5db;line-height:1.7;font-size:0.9rem;">
-                <p style="margin-bottom:1rem;">Pick &amp; Truck (la "aplicación" propiedad de la empresa <strong style="color:#fff;">Makoto Global Logistics and Trade LLC</strong>) reconoce la importancia de la privacidad y la protección de datos en el entorno digital. Esta Política establece las prácticas aplicables al tratamiento de la información personal recopilada a través de nuestra plataforma. Al utilizarla, usted reconoce y acepta estas disposiciones.</p>
+                <p style="color:#9ca3af;font-size:0.8rem;margin-bottom:0.75rem;">Última actualización: 20 de noviembre de 2025</p>
+                <p style="margin-bottom:1rem;">Pick &amp; Truck (la "aplicación" propiedad de la empresa <strong style="color:#fff;">Makoto Global Logistics and Trade LLC</strong>, la "plataforma", "nosotros" o "nuestro") reconoce la importancia de la privacidad y la protección de datos en el entorno digital. Esta Política de Privacidad establece las prácticas aplicables al tratamiento de la información personal recopilada a través de nuestra plataforma tecnológica (la "Plataforma"), cuyo objeto es facilitar la conexión entre freight forwarders y empresas de transporte terrestre.<br><br>
+                Al utilizar la Plataforma, usted reconoce y acepta las disposiciones de esta Política de Privacidad.</p>
 
                 <h3 style="color:#4ade80;font-size:1rem;font-weight:600;margin:1.25rem 0 0.5rem;">1. Información Recopilada</h3>
                 <p>La Empresa podrá recopilar y procesar las siguientes categorías de información:<br><br>
                 • Datos de identificación y contacto: nombre completo, razón social, dirección, correo electrónico, número de teléfono.<br>
                 • Datos corporativos: licencias, permisos y otra documentación relacionada con la actividad empresarial.<br>
                 • Datos financieros: información de facturación y métodos de pago (procesados a través de proveedores autorizados).<br>
-                • Datos técnicos: dirección IP, tipo de dispositivo, sistema operativo, navegador, ubicación aproximada, registros de uso.<br>
+                • Datos técnicos: dirección IP, tipo de dispositivo, sistema operativo, navegador, ubicación aproximada, registros de uso de la Plataforma.<br>
                 • Datos derivados de la interacción: historial de búsqueda, conexiones realizadas, cotizaciones solicitadas o enviadas.</p>
 
                 <h3 style="color:#4ade80;font-size:1rem;font-weight:600;margin:1.25rem 0 0.5rem;">2. Finalidades del Tratamiento</h3>
@@ -200,16 +202,18 @@
                 <p>El tratamiento de datos personales se fundamenta en:<br><br>
                 • La necesidad contractual derivada de la relación entre la Empresa y el Usuario.<br>
                 • El consentimiento expreso otorgado por el Usuario al registrarse en la Plataforma.<br>
-                • El interés legítimo de la Empresa en garantizar la seguridad e integridad de la Plataforma.</p>
+                • El interés legítimo de la Empresa en garantizar la seguridad, integridad y correcto funcionamiento de la Plataforma.</p>
 
                 <h3 style="color:#4ade80;font-size:1rem;font-weight:600;margin:1.25rem 0 0.5rem;">4. Cesión y Transferencia de Datos</h3>
                 <p>La Empresa podrá comunicar información personal a:<br><br>
                 • Otros Usuarios de la Plataforma, cuando resulte necesario para establecer relaciones comerciales.<br>
-                • Proveedores de servicios externos, incluyendo hosting, pasarelas de pago, sistemas de autenticación, seguridad y soporte técnico.<br>
-                • Autoridades competentes en cumplimiento de requerimientos legales, regulatorios o judiciales.</p>
+                • Proveedores de servicios externos, incluyendo proveedores de hosting, pasarelas de pago, sistemas de autenticación, seguridad y soporte técnico.<br>
+                • Autoridades competentes en cumplimiento de requerimientos legales, regulatorios o judiciales.<br>
+                • Entidades vinculadas a procesos corporativos, como fusiones, adquisiciones o reorganizaciones empresariales.<br><br>
+                En todos los casos, la Empresa adoptará medidas contractuales y técnicas razonables para garantizar la seguridad y confidencialidad de los datos compartidos.</p>
 
                 <h3 style="color:#4ade80;font-size:1rem;font-weight:600;margin:1.25rem 0 0.5rem;">5. Cookies y Herramientas de Seguimiento</h3>
-                <p>La Plataforma utiliza cookies y tecnologías similares para autenticar usuarios, recordar preferencias y analizar métricas de uso. Los usuarios pueden desactivar las cookies mediante su navegador; sin embargo, algunas funcionalidades pueden verse limitadas.</p>
+                <p>La Plataforma utiliza cookies y tecnologías similares para autenticar usuarios, recordar preferencias y analizar métricas de uso. Los usuarios pueden desactivar las cookies mediante su navegador; sin embargo, algunas funcionalidades pueden verse limitadas como resultado.</p>
 
                 <h3 style="color:#4ade80;font-size:1rem;font-weight:600;margin:1.25rem 0 0.5rem;">6. Seguridad de la Información</h3>
                 <p>La Empresa aplica medidas técnicas y organizativas de nivel empresarial para proteger los datos contra accesos no autorizados, pérdida, alteración o divulgación indebida. Sin embargo, el Usuario reconoce que ningún sistema de transmisión o almacenamiento electrónico es absolutamente seguro.</p>
@@ -220,16 +224,19 @@
                 <h3 style="color:#4ade80;font-size:1rem;font-weight:600;margin:1.25rem 0 0.5rem;">8. Derechos del Usuario</h3>
                 <p>Los usuarios pueden ejercer los siguientes derechos: acceso a los datos personales, rectificación de información inexacta, solicitud de eliminación, oposición al tratamiento y limitación del uso de datos.<br><br>
                 Los residentes de California pueden ejercer los derechos previstos en la California Consumer Privacy Act (CCPA).<br><br>
-                Las solicitudes deben enviarse a: <strong style="color:#fff;">soporte@pickntruck.com</strong></p>
+                Las solicitudes deben enviarse por escrito a: <strong style="color:#fff;">soporte@pickntruck.com</strong></p>
 
                 <h3 style="color:#4ade80;font-size:1rem;font-weight:600;margin:1.25rem 0 0.5rem;">9. Menores de Edad</h3>
-                <p>La Plataforma no está destinada a menores de 18 años. La Empresa no recopila intencionalmente información personal de menores y, si se detecta, procederá a su eliminación inmediata.</p>
+                <p>La Plataforma no está destinada a menores de 18 años. La Empresa no recopila intencionalmente información personal de menores y, si se detecta dicha información, procederá a su eliminación inmediata.</p>
 
                 <h3 style="color:#4ade80;font-size:1rem;font-weight:600;margin:1.25rem 0 0.5rem;">10. Modificaciones</h3>
                 <p>La Empresa podrá modificar esta Política en cualquier momento. La versión vigente estará disponible en la Plataforma. El uso continuado de la Plataforma tras la publicación de cambios constituirá aceptación de la nueva Política.</p>
 
-                <h3 style="color:#4ade80;font-size:1rem;font-weight:600;margin:1.25rem 0 0.5rem;">11. Contacto</h3>
-                <p>Para ejercer derechos o presentar consultas relacionadas con esta Política:<br>
+                <h3 style="color:#4ade80;font-size:1rem;font-weight:600;margin:1.25rem 0 0.5rem;">11. Ley Aplicable y Jurisdicción</h3>
+                <p>Esta Política se rige por las leyes del Estado de Florida, Estados Unidos de América. Cualquier controversia derivada de su interpretación o aplicación será sometida a los tribunales competentes de dicha jurisdicción, salvo acuerdo en contrario de las partes.</p>
+
+                <h3 style="color:#4ade80;font-size:1rem;font-weight:600;margin:1.25rem 0 0.5rem;">12. Contacto</h3>
+                <p>Para ejercer derechos o presentar consultas relacionadas con esta Política, el Usuario podrá dirigirse a:<br><br>
                 <strong style="color:#fff;">soporte@pickntruck.com</strong></p>
 
                 <div style="padding-top:1.5rem;border-top:1px solid #374151;margin-top:1.5rem;text-align:center;">

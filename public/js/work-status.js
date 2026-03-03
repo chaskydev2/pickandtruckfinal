@@ -20,6 +20,12 @@ window.BidStatusUpdater = class BidStatusUpdater {
         this.reconnectAttempts = 0;
         this.maxReconnectAttempts = 5;
         this.reconnectTimeout = null;
+        this.pollingInterval = null;
+        // Inicializar con estado actual de la página para detectar cambios desde el primer poll
+        const initialEstado = document.body.getAttribute('data-bid-estado') || '';
+        const initialA = document.body.getAttribute('data-confirmacion-a') || '0';
+        const initialB = document.body.getAttribute('data-confirmacion-b') || '0';
+        this.lastKnownStatus = initialEstado ? `${initialEstado}|${initialA}|${initialB}` : null;
         
         if (!this.bidId) {
             return;
@@ -30,8 +36,37 @@ window.BidStatusUpdater = class BidStatusUpdater {
     
     async init() {
         this.setupFormHandlers();
-        
+        this.startPolling();
         await this.setupPusherConnection();
+    }
+
+    startPolling() {
+        if (this.pollingInterval) return;
+        this.pollingInterval = setInterval(async () => {
+            try {
+                const response = await fetch(`/work/${this.bidId}/check-status`, {
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': this.csrfToken || ''
+                    },
+                    credentials: 'same-origin'
+                });
+                if (!response.ok) return;
+                const data = await response.json();
+                if (data.success && data.bid) {
+                    const newStatus = data.bid.estado +
+                        '|' + (data.bid.confirmacion_usuario_a ? '1' : '0') +
+                        '|' + (data.bid.confirmacion_usuario_b ? '1' : '0');
+                    if (this.lastKnownStatus !== null && newStatus !== this.lastKnownStatus) {
+                        // Recargar la página — forma más simple y confiable
+                        window.location.reload();
+                        return;
+                    }
+                    this.lastKnownStatus = newStatus;
+                }
+            } catch (e) { /* silencioso */ }
+        }, 4000);
     }
     
     setupFormHandlers() {
@@ -331,6 +366,11 @@ window.BidStatusUpdater = class BidStatusUpdater {
         if (this.reconnectTimeout) {
             clearTimeout(this.reconnectTimeout);
             this.reconnectTimeout = null;
+        }
+
+        if (this.pollingInterval) {
+            clearInterval(this.pollingInterval);
+            this.pollingInterval = null;
         }
     }
     

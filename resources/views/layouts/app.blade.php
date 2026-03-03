@@ -28,8 +28,8 @@
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     @endif
 
-    <link href="{{ asset('css/theme.css') }}" rel="stylesheet"> {{-- Tu paleta/variables --}}
-    <link href="{{ asset('css/custom.css') }}" rel="stylesheet"> {{-- Ajustes finos al final --}}
+    <link href="{{ asset('css/theme.css') }}?v={{ filemtime(public_path('css/theme.css')) }}" rel="stylesheet"> {{-- Tu paleta/variables --}}
+    <link href="{{ asset('css/custom.css') }}?v={{ filemtime(public_path('css/custom.css')) }}" rel="stylesheet"> {{-- Ajustes finos al final --}}
 
     <!-- 4) Font Awesome (puede ir aquí o arriba; no afecta la cascada de botones) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
@@ -37,11 +37,11 @@
         crossorigin="anonymous" referrerpolicy="no-referrer" />
 
     <!-- Sistema de notificaciones toast -->
-    <link href="{{ asset('css/toast-notifications.css') }}?v={{ time() }}" rel="stylesheet">
-    <script src="{{ asset('js/toast-notifications.js') }}?v={{ time() }}"></script>
+    <link href="{{ asset('css/toast-notifications.css') }}?v={{ filemtime(public_path('css/toast-notifications.css')) }}" rel="stylesheet">
+    <script src="{{ asset('js/toast-notifications.js') }}?v={{ filemtime(public_path('js/toast-notifications.js')) }}"></script>
 
     <!-- Cargar chat.js después de app.js -->
-    <script src="{{ asset('js/chat.js') }}" defer></script>
+    <script src="{{ asset('js/chat.js') }}?v={{ filemtime(public_path('js/chat.js')) }}" defer></script>
 
     @stack('styles')
 
@@ -506,7 +506,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 
-    <script src="{{ asset('js/notifications.js') }}?v=20260301_1700"></script>
+    <script src="{{ asset('js/notifications.js') }}?v={{ filemtime(public_path('js/notifications.js')) }}"></script>
 
     @stack('scripts')
 

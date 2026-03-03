@@ -379,4 +379,28 @@ class WorkProgressController extends Controller
             } return redirect()->back()->with('error', 'Ocurrió un error al procesar el rechazo.');
         }
     }
+
+    /**
+     * Devuelve el estado actual del bid (usado por polling AJAX).
+     */
+    public function checkStatus(Request $request, Bid $bid)
+    {
+        $bid->load('bideable');
+
+        if (Auth::id() !== $bid->user_id && (!$bid->bideable || Auth::id() !== $bid->bideable->user_id)) {
+            return response()->json(['success' => false, 'message' => 'No autorizado'], 403);
+        }
+
+        $bid->refresh();
+
+        return response()->json([
+            'success' => true,
+            'bid' => [
+                'id'                     => $bid->id,
+                'estado'                 => $bid->estado,
+                'confirmacion_usuario_a' => (bool) $bid->confirmacion_usuario_a,
+                'confirmacion_usuario_b' => (bool) $bid->confirmacion_usuario_b,
+            ]
+        ]);
+    }
 }

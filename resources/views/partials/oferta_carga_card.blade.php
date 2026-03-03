@@ -212,7 +212,7 @@
                             {{-- Herramientas del dueño (no cambia la lógica de Seguimiento) --}}
                             @can('update', $oferta)
                                 <a href="{{ route('ofertas_carga.edit', $oferta) }}" class="btn btn-warning">
-                                    <i class="fas fa-edit"></i> Editar oferta
+                                    <i class="fas fa-edit"></i> Editar publicación
                                 </a>
                             @else
                                 <button class="btn btn-warning" disabled>

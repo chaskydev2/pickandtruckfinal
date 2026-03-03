@@ -32,7 +32,7 @@ class EmpresaController extends Controller
                 // Crear una empresa básica para evitar errores
                 Log::info("No se encontró empresa para el usuario {$user->id}, creando empresa básica");
                 $empresa = new Empresa();
-                $empresa->nombre = $user->name . ' (Empresa)';
+                $empresa->nombre = $user->company_name ?? '';
                 $empresa->user_id = $user->id;
                 $empresa->save();
                 

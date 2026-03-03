@@ -5,6 +5,9 @@
     data-user-id="{{ auth()->id() }}"
     data-user-a-id="{{ $bid->user_id }}"
     data-user-b-id="{{ $bid->bideable->user_id }}"
+    data-bid-estado="{{ $bid->estado }}"
+    data-confirmacion-a="{{ $bid->confirmacion_usuario_a ? '1' : '0' }}"
+    data-confirmacion-b="{{ $bid->confirmacion_usuario_b ? '1' : '0' }}"
 @endpush
 
 @push('styles')
@@ -389,6 +392,46 @@
         });
     </script>
 
+    {{-- Polling autónomo: recarga la página si el estado del bid cambia --}}
+    <script>
+    (function() {
+        var bidId    = {{ $bid->id }};
+        var csrfToken = document.querySelector('meta[name="csrf-token"]') ? document.querySelector('meta[name="csrf-token"]').content : '';
+        var baseStatus = '{{ $bid->estado }}|{{ $bid->confirmacion_usuario_a ? "1" : "0" }}|{{ $bid->confirmacion_usuario_b ? "1" : "0" }}';
+        var reloading = false;
+
+        function checkBidStatus() {
+            if (reloading) return;
+            fetch('/work/' + bidId + '/check-status', {
+                credentials: 'same-origin',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken
+                }
+            })
+            .then(function(r) { return r.ok ? r.json() : null; })
+            .then(function(data) {
+                if (!data || !data.success || !data.bid) return;
+                var newStatus = data.bid.estado
+                    + '|' + (data.bid.confirmacion_usuario_a ? '1' : '0')
+                    + '|' + (data.bid.confirmacion_usuario_b ? '1' : '0');
+                if (newStatus !== baseStatus) {
+                    reloading = true;
+                    window.location.reload();
+                }
+            })
+            .catch(function() {});
+        }
+
+        // Empezar a los 3 segundos para no interferir con la carga inicial
+        setTimeout(function() {
+            checkBidStatus();
+            setInterval(checkBidStatus, 4000);
+        }, 3000);
+    })();
+    </script>
+
     {{-- Módulo que escucha BidStatusUpdated / maneja .form-ajax / badges, etc. --}}
-    <script src="{{ asset('js/work-status.js') }}" defer></script>
+    <script src="{{ asset('js/work-status.js') }}?v={{ filemtime(public_path('js/work-status.js')) }}" defer></script>
 @endpush
