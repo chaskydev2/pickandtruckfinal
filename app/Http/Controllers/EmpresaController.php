@@ -145,7 +145,13 @@ class EmpresaController extends Controller
                 $empresa = Empresa::create($validatedData);
                 Log::info("Empresa creada para el usuario: {$user->id}");
             }
-            
+
+            // Sincronizar tel\u00e9fono con el usuario
+            if (!empty($validatedData['telefono'])) {
+                $user->phone = $validatedData['telefono'];
+                $user->save();
+            }
+
             return redirect()->route('empresas.show')->with('success', 'Información de la empresa actualizada correctamente.');
         } catch (\Exception $e) {
             Log::error("Error al guardar empresa: " . $e->getMessage());

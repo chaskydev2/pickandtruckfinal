@@ -47,6 +47,12 @@
             @endif
         </div>
 
+        <div class="mb-3">
+            <x-input-label for="phone" :value="__('Teléfono')" />
+            <x-text-input id="phone" name="phone" type="tel" class="mt-1 block w-full form-control bg-white text-dark" :value="old('phone', $user->phone)" autocomplete="tel" />
+            <x-input-error class="mt-2" :messages="$errors->get('phone')" />
+        </div>
+
         <div class="d-flex align-items-center gap-3">
             <button type="submit" class="btn btn-primary fw-bold px-4">
                 {{ __('Guardar') }}

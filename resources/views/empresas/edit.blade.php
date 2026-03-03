@@ -102,7 +102,7 @@
 
                         <div class="mb-3">
                             <label for="telefono" class="form-label">Teléfono</label>
-                            <input type="text" class="form-control @error('telefono') is-invalid @enderror" id="telefono" name="telefono" value="{{ old('telefono', $empresa->telefono ?? '') }}">
+                            <input type="text" class="form-control @error('telefono') is-invalid @enderror" id="telefono" name="telefono" value="{{ old('telefono', $empresa->telefono ?? auth()->user()->phone ?? '') }}">
                             @error('telefono')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror

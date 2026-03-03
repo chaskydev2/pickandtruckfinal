@@ -43,20 +43,24 @@ class DocumentStatusChanged extends Notification
         $documentName = $this->document->requiredDocument->name ?? 'Documento';
         
         if ($this->document->status === 'aprobado') {
+            $title   = '✓ Documento Aprobado';
             $message = "✓ Tu documento '{$documentName}' ha sido aprobado.";
             $icon = 'check-circle';
             $type = 'success';
         } elseif ($this->document->status === 'rechazado') {
+            $title   = '✗ Documento Rechazado';
             $message = "✗ Tu documento '{$documentName}' ha sido rechazado.";
             $icon = 'times-circle';
             $type = 'danger';
         } else {
+            $title   = '📄 Actualización de Documento';
             $message = "Tu documento '{$documentName}' ha sido actualizado.";
             $icon = 'file-alt';
             $type = 'info';
         }
         
         return [
+            'title'   => $title,
             'message' => $message,
             'document_id' => $this->document->id,
             'document_name' => $documentName,

@@ -95,13 +95,13 @@ class RegisterController extends Controller
             try {
                 // Crear la empresa asociada al usuario
                 Empresa::create([
-                    'user_id' => $user->id,
-                    'nombre' => $request->company_name,
-                    'logo' => null, // Logo se puede agregar después en el perfil
-                    'descripcion' => null,
-                    'telefono' => null,
-                    'direccion' => $request->city . ', ' . $request->country,
-                    'sitio_web' => null,
+                    'user_id'    => $user->id,
+                    'nombre'     => $request->company_name,
+                    'logo'       => null,
+                    'descripcion'=> null,
+                    'telefono'   => $request->phone, // Copiado automáticamente del registro
+                    'direccion'  => $request->city . ', ' . $request->country,
+                    'sitio_web'  => null,
                     'verificada' => false,
                 ]);
                 

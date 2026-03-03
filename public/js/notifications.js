@@ -26,6 +26,7 @@ if (typeof window.RealTimeNotifications === 'undefined') {
             this.notificationsCount = this.notificationBadge ? parseInt(this.notificationBadge.textContent || '0') : 0;
             this.lastNotificationIds = new Set(); // Guardar IDs de notificaciones ya procesadas
             this.isProcessingNotifications = false;
+            this.isInitialCheck = true; // Primera carga: solo registrar IDs existentes, sin mostrar toasts
 
             // Asegurar que existe el token CSRF
             if (!this.csrfToken) {
@@ -125,19 +126,25 @@ if (typeof window.RealTimeNotifications === 'undefined') {
 
                     // Procesar nuevas notificaciones
                     if (newNotifications.length > 0) {
-                        console.log('✨ ¡Nuevas notificaciones detectadas!', newNotifications.length);
-                        newNotifications.forEach(notification => {
-                            this.handleNewNotification(notification);
-                        });
-                        
-                        // Reproducir sonido si está habilitado
-                        if (this.options.playSound) {
-                            this.playNotificationSound();
+                        if (this.isInitialCheck) {
+                            // Primera carga: solo registrar IDs previas, nunca disparar toasts
+                            console.log('📋 Carga inicial: registrando', newNotifications.length, 'notificaciones existentes sin mostrar toasts.');
+                        } else {
+                            console.log('✨ ¡Nuevas notificaciones detectadas!', newNotifications.length);
+                            newNotifications.forEach(notification => {
+                                this.handleNewNotification(notification);
+                            });
+
+                            // Reproducir sonido si está habilitado
+                            if (this.options.playSound) {
+                                this.playNotificationSound();
+                            }
                         }
                     }
 
                     // Actualizar el contador guardado
                     this.notificationsCount = data.count;
+                    this.isInitialCheck = false; // A partir de aquí, notificaciones nuevas sí muestran toast
                     this.isProcessingNotifications = false;
                 })
                 .catch(error => {
@@ -263,6 +270,10 @@ if (typeof window.RealTimeNotifications === 'undefined') {
             return;
         }
 
+        resolveNotificationTitle(data, status) {
+            return resolveNotificationTitle(data, status);
+        }
+
         handleNewNotification(notification) {
             if (!notification || !notification.data) return;
 
@@ -273,31 +284,27 @@ if (typeof window.RealTimeNotifications === 'undefined') {
 
             console.log('📬 Procesando nueva notificación:', {
                 id: notification.id,
+                type: notification.type,
                 status: status,
                 message: message,
+                bid_id: data.bid_id,
                 document_id: data.document_id
             });
 
             // Mostrar toast si la función está disponible
             if (typeof window.showToastNotification === 'function') {
-                let title = '🔔 Nueva Notificación';
+                // Usar título del servidor; si es notificación antigua sin title, deducirlo
+                const title = this.resolveNotificationTitle(data, status);
+
+                // toastType y duration según el status del servidor
                 let toastType = 'info';
                 let duration = 6000;
-
-                // Personalizar según el tipo de notificación
-                if (status === 'aprobado') {
-                    title = '✓ ¡Documento Aprobado!';
+                if (status === 'aceptado' || status === 'aprobado') {
                     toastType = 'success';
                     duration = 8000;
-                    console.log('✅ Mostrando notificación de documento APROBADO');
                 } else if (status === 'rechazado') {
-                    title = '✗ Documento Rechazado';
                     toastType = 'error';
                     duration = 10000;
-                    console.log('❌ Mostrando notificación de documento RECHAZADO');
-                } else if (type === 'document') {
-                    title = '📄 Actualización de Documento';
-                    toastType = 'info';
                 }
 
                 window.showToastNotification(title, message, toastType, duration);
@@ -404,6 +411,25 @@ window.markAllAsRead = function () {
         });
 };
 
+// Función global para resolver el título de una notificación
+// Soporta notificaciones nuevas (con data.title del servidor) y antiguas (sin title)
+function resolveNotificationTitle(data, status) {
+    if (data && data.title) return data.title;
+    const isBid = !!(data && data.bid_id);
+    const isDoc = !!(data && data.document_id);
+    if (isBid) {
+        if (status === 'aceptado') return '✓ ¡Oferta Aceptada!';
+        if (status === 'rechazado') return '✗ Oferta Rechazada';
+        return '🔔 Nueva Oferta';
+    }
+    if (isDoc) {
+        if (status === 'aprobado') return '✓ Documento Aprobado';
+        if (status === 'rechazado') return '✗ Documento Rechazado';
+        return '📄 Actualización de Documento';
+    }
+    return '🔔 Nueva Notificación';
+}
+
 // Inicializar notificaciones en tiempo real con Echo/Pusher
 document.addEventListener('DOMContentLoaded', function() {
     // Esperar a que Echo esté disponible
@@ -462,11 +488,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 // ====== TOAST NOTIFICATION ======
                 // Mostrar toast notification flotante (visible incluso si hay scroll)
                 if (typeof window.showToastNotification === 'function') {
-                    const toastType = getNotificationToastType(notification);
-                    const toastTitle = notification.title || 'Nueva Notificación';
+                    const nStatus = notification.status || '';
+                    // Usar título del servidor; si es notificación antigua sin title, deducirlo
+                    const toastTitle = resolveNotificationTitle(notification, nStatus);
                     const toastMessage = notification.message || 'Tienes una nueva actualización';
-                    
-                    window.showToastNotification(toastTitle, toastMessage, toastType, 7000);
+                    let toastType = 'info';
+                    let toastDuration = 7000;
+                    if (nStatus === 'aceptado' || nStatus === 'aprobado') { toastType = 'success'; toastDuration = 8000; }
+                    else if (nStatus === 'rechazado') { toastType = 'error'; toastDuration = 10000; }
+
+                    window.showToastNotification(toastTitle, toastMessage, toastType, toastDuration);
                 }
 
                 // Mostrar notificación del navegador si están permitidas

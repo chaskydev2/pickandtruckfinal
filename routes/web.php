@@ -62,6 +62,18 @@ Route::middleware(['auth', VerifiedUser::class])->group(function () {
         return view('partials.oferta_ruta_card', compact('oferta'))->render();
     })->name('partials.ofertas_ruta.card');
 
+    Route::get('/ofertas/{id}/bids-count', function($id) {
+        $oferta = \App\Models\OfertaRuta::findOrFail($id);
+        if (Auth::id() !== $oferta->user_id) abort(403);
+        return response()->json(['count' => $oferta->bids()->count()]);
+    })->name('ofertas.bids-count');
+
+    Route::get('/ofertas_carga/{id}/bids-count', function($id) {
+        $oferta = \App\Models\OfertaCarga::findOrFail($id);
+        if (Auth::id() !== $oferta->user_id) abort(403);
+        return response()->json(['count' => $oferta->bids()->count()]);
+    })->name('ofertas_carga.bids-count');
+
     Route::resource('ofertas', OfertaRutaController::class);
     Route::resource('ofertas_carga', OfertaCargaController::class, [
         'parameters' => ['ofertas_carga' => 'oferta']

@@ -409,7 +409,7 @@
 
                         <!-- Lista de Bids (para el dueño de la publicación) -->
                         @if (Auth::check() && Auth::id() === $oferta->user_id)
-                            <div class="card">
+                            <div class="card" id="bids-owner-card">
                                 <div class="card-header bg-light">
                                     <h5 class="card-title mb-0">Ofertas Recibidas ({{ $oferta->bids->count() }})</h5>
                                 </div>
@@ -605,8 +605,17 @@
             </div>
         </div>
     </div>
+    <script>
+        // Tiempo real: recargar si existe el card de ofertas recibidas
+        (function() {
+            if (document.getElementById('bids-owner-card')) {
+                console.log('[Realtime] Card encontrado, recargando cada 8s');
+                setInterval(function() { window.location.reload(); }, 8000);
+            }
+        })();
+    </script>
 @endsection
 
 @push('scripts')
-<script src="{{ asset('js/ofertas-realtime.js') }}"></script>
+<script src="{{ asset('js/ofertas-realtime.js') }}?v={{ time() }}"></script>
 @endpush

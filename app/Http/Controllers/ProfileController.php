@@ -42,6 +42,11 @@ class ProfileController extends Controller
 
         $request->user()->save();
 
+        // Sincronizar tel\u00e9fono con la empresa si existe
+        if ($request->filled('phone') && $request->user()->empresa) {
+            $request->user()->empresa->update(['telefono' => $request->phone]);
+        }
+
         return Redirect::route('profile.edit')->with('status', 'profile-updated');
     }
 

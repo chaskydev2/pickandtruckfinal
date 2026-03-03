@@ -506,7 +506,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 
-    <script src="{{ asset('js/notifications.js') }}?v={{ time() }}"></script>
+    <script src="{{ asset('js/notifications.js') }}?v=20260301_1700"></script>
 
     @stack('scripts')
 

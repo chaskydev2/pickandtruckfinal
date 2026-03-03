@@ -78,9 +78,9 @@
     <div class="header">
         <h1 style="margin: 0;">
             @if($document->status === 'aprobado')
-                ✓ Documento Aprobado
+                Aprobado
             @elseif($document->status === 'rechazado')
-                ✗ Documento Rechazado
+                Rechazado
             @else
                 Actualización de Documento
             @endif

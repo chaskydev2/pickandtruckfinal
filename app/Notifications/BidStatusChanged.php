@@ -47,14 +47,19 @@ class BidStatusChanged extends Notification
         $url = $this->status === 'aceptado'
             ? route('work.show', $this->bid)
             : route('bids.index');
+
+        $title = $this->status === 'aceptado'
+            ? '✓ ¡Oferta Aceptada!'
+            : '✗ Oferta Rechazada';
             
         return [
+            'title'   => $title,
             'message' => $this->status === 'aceptado' 
                 ? "Tu oferta de $" . number_format($this->bid->monto, 2) . " ha sido aceptada."
                 : "Tu oferta de $" . number_format($this->bid->monto, 2) . " ha sido rechazada.",
-            'bid_id' => $this->bid->id,
-            'status' => $this->status,
-            'url' => $url
+            'bid_id'  => $this->bid->id,
+            'status'  => $this->status,
+            'url'     => $url
         ];
     }
 }

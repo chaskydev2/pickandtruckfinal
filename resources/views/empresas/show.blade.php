@@ -124,7 +124,7 @@
                                                 </div>
                                                 <div>
                                                     <div class="fw-bold">Teléfono</div>
-                                                    <div>{{ $empresa->telefono ?? 'No disponible' }}</div>
+                                                    <div>{{ $empresa->telefono ?? $empresa->user->phone ?? 'No disponible' }}</div>
                                                 </div>
                                             </div>
                                         </li>
@@ -148,7 +148,13 @@
                                                 <div>
                                                     <div class="fw-bold">Sitio Web</div>
                                                     <div>
-                                                        <a href="{{ $empresa->sitio_web }}" target="_blank" class="text-primary">
+                                                        @php
+                                                            $webUrl = $empresa->sitio_web;
+                                                            if (!preg_match('/^https?:\/\//i', $webUrl)) {
+                                                                $webUrl = 'https://' . $webUrl;
+                                                            }
+                                                        @endphp
+                                                        <a href="{{ $webUrl }}" target="_blank" rel="noopener noreferrer" class="text-primary">
                                                             {{ $empresa->sitio_web }}
                                                             <i class="fas fa-external-link-alt fa-xs ms-1"></i>
                                                         </a>

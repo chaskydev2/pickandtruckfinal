@@ -51,7 +51,7 @@ class NewChatMessage extends Notification
             'type' => 'chat_message',
             'message' => "Nuevo mensaje de {$sender->name}: {$shortContent}",
             'chat_id' => (string)$chat->id, // Aseguramos que sea string para la comparación
-            'url' => route('chats.show', $chat->id),
+            'url' => route('work.show', $chat->bid_id),
             'sender_name' => $sender->name,
             'sender_id' => $sender->id,
             'content_preview' => $shortContent,

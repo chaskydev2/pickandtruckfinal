@@ -97,17 +97,6 @@
                         </div>
 
                         <div class="form-group mb-3">
-                            <label for="tipo_despacho">Tipo de Despacho Aduanero (Opcional)</label>
-                            <select id="tipo_despacho" name="tipo_despacho" class="form-control">
-                                <option value="" selected>No especificado</option>
-                                <option value="despacho_anticipado" {{ old('tipo_despacho') == 'despacho_anticipado' ? 'selected' : '' }}>Despacho Anticipado</option>
-                                <option value="despacho_general" {{ old('tipo_despacho') == 'despacho_general' ? 'selected' : '' }}>Despacho General</option>
-                                <option value="no_sabe_no_responde" {{ old('tipo_despacho') == 'no_sabe_no_responde' ? 'selected' : '' }}>No sabe/No responde</option>
-                            </select>
-                            <small class="form-text text-muted">Selecciona una opción si aplica a tu ruta.</small>
-                        </div>
-
-                        <div class="form-group mb-3">
                             <label for="descripcion">Comentarios (Opcional)</label>
                             <textarea id="descripcion" name="descripcion" class="form-control" rows="3" placeholder="Ej: Ruta disponible solo en las mañanas, se aceptan mascotas, etc.">{{ old('descripcion') }}</textarea>
                         </div>
